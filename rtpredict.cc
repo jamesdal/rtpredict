@@ -143,11 +143,7 @@ int main (int argc, char *argv[])
             filenamewithextdotarff.insert(filenamewithextdotarff.end(), std::string(".arff").begin(), std::string(".arff").end());
             ofstream fromCSV(filenamewithextdotarff.c_str());
             fromCSV  << "@RELATION ilist\n\n";
-            fromCSV  << "@ATTRIBUTE mz  NUMERIC\n";
-            fromCSV  << "@ATTRIBUTE charge  NUMERIC\n";
-            fromCSV  << "@ATTRIBUTE intensity  NUMERIC\n";
-            fromCSV  << "@ATTRIBUTE rt  NUMERIC\n\n";
-            fromCSV  << "@DATA\n";
+
 
             //first line contains the differing fields, so scanning will take place here
             getline(csvfile,line);
@@ -226,24 +222,29 @@ int main (int argc, char *argv[])
             }
             else if(strcmp(field.c_str(),"mz")==0)
             {
+                fromCSV  << "@ATTRIBUTE mz  NUMERIC\n";
                 fields[fieldspos] = "mz";
                 fieldspos++;
             }
             else if(strcmp(field.c_str(),"charge")==0)
             {
+                fromCSV  << "@ATTRIBUTE charge  NUMERIC\n";
                 fields[fieldspos] = "charge";
                 fieldspos++;
             }
             else if(strcmp(field.c_str(),"intensity")==0)
             {
+                fromCSV  << "@ATTRIBUTE intensity  NUMERIC\n";
                 fields[fieldspos] = "intensity";
                 fieldspos++;
             }
             else if(strcmp(field.c_str(),"rt")==0)
             {
+                fromCSV  << "@ATTRIBUTE rt  NUMERIC\n\n";
                 fields[fieldspos] = "rt";
                 fieldspos++;
             }
+            fromCSV  << "@DATA\n";
             //end istringstream of the first line (which contains the column labels)
 
             while (csvfile.good())
@@ -266,17 +267,21 @@ int main (int argc, char *argv[])
                         int aapos = 0;
 
                         while (acid[aapos] != '\0')
-{
-
-                        countAA(seq_tmp,acid.at(aapos));
-}
+                        {
+                            char* aacountwithcomma = "";
+                            sprintf(aacountwithcomma,"%d,",countAA(seq_tmp,acid.at(aapos)));
+                            restructured_line.append(aacountwithcomma);  //this loop should put counts of all the amino acids right after the sequence
+                            aapos++;
+                        }
                     }
                     else
                     {
+                        restructured_line.append(field).append(",");
+
 
                     }
+                    restructured_line.erase(restructured_line.end());
                 }
-
                 fromCSV << line << endl;
                 cout << line << endl;
             }
@@ -304,7 +309,7 @@ int main (int argc, char *argv[])
         printf("usage rtpredict -train TRAININGFILE.EXT \n  Currently supported formats include: \n csv");
         return 0;
     }
-//SCANARGS IF STATEMENT GOES HERE
+    /*
 //system("java -classpath ./weka.jar weka.filters.supervised.instance.StratifiedRemoveFolds -i fromCSV.arff -o Train.arff -c last -N 4 -F 1 -V");
     //system("java -classpath ./weka.jar weka.filters.supervised.instance.StratifiedRemoveFolds -i fromCSV.arff -o Test.arff -c last -N 4 -F 1");
 
@@ -312,7 +317,7 @@ int main (int argc, char *argv[])
     system("java -classpath ./weka.jar -Xmx512m weka.classifiers.rules.M5Rules -M 4.0 -train fromCSV.arff -o -split-percentage 1 > wekaoutput.txt");
     //this will run all algorithms... some sort of limiting measure needs to be done, split validation to select the correct one before a real analysis is to take place.
     system("java -classpath ./weka.jar -Xmx512m weka.classifiers.meta.MultiScheme -X 0 -S 1 -B \"weka.classifiers.rules.M5Rules -M 4.0\" -B \"weka.classifiers.trees.REPTree -M 2 -V 0.001 -N 3 -S 1 -L -1 -I 0.0\" -B \"weka.classifiers.trees.M5P -M 4.0\" -B \"weka.classifiers.lazy.LWL -U 0 -K -1 -A \"weka.core.neighboursearch.LinearNNSearch -A \\\"weka.core.EuclideanDistance -R first-last\\\"\" -W weka.classifiers.trees.DecisionStump\" -B \"weka.classifiers.lazy.KStar -B 20 -M a\" -B \"weka.classifiers.lazy.IBk -K 1 -W 0 -A \"weka.core.neighboursearch.LinearNNSearch -A \\\"weka.core.EuclideanDistance -R first-last\\\"\"\" -B \"weka.classifiers.functions.MultilayerPerceptron -L 0.3 -M 0.2 -N 500 -V 0 -S 0 -E 20 -H a\" -B \"weka.classifiers.functions.SMOreg -C 1.0 -N 0 -I \"weka.classifiers.functions.supportVector.RegSMOImproved -L 0.001 -W 1 -P 1.0E-12 -train 0.001 -V\" -K \"weka.classifiers.functions.supportVector.PolyKernel -C 250007 -E 1.0\"\" -B \"weka.classifiers.functions.SimpleLinearRegression \" -B \"weka.classifiers.rules.ZeroR \" -B \"weka.classifiers.meta.Bagging -P 100 -S 1 -num-slots 1 -I 10 -W weka.classifiers.trees.REPTree -- -M 2 -V 0.001 -N 3 -S 1 -L -1 -I 0.0\" -B \"weka.classifiers.functions.GaussianProcesses -L 1.0 -N 0 -K \"weka.classifiers.functions.supportVector.PolyKernel -C 250007 -E 1.0\"\" -B \"weka.classifiers.meta.RandomSubSpace -P 0.5 -S 1 -num-slots 1 -I 10 -W weka.classifiers.trees.REPTree -- -M 2 -V 0.001 -N 3 -S 1 -L -1 -I 0.0\" -B \"weka.classifiers.meta.CVParameterSelection -X 10 -S 1 -W weka.classifiers.rules.ZeroR\" -B \"weka.classifiers.meta.RegressionByDiscretization -B 10 -K 0 -W weka.classifiers.trees.J48 -- -C 0.25 -M 2\" -B \"weka.classifiers.meta.Stacking -X 10 -M \"weka.classifiers.rules.ZeroR \" -S 1 -num-slots 1 -B \"weka.classifiers.rules.ZeroR \"\" -B \"weka.classifiers.meta.Vote -S 1 -B \"weka.classifiers.rules.ZeroR \" -R AVG\" -B \"weka.classifiers.rules.DecisionTable -X 1 -S \"weka.attributeSelection.BestFirst -D 1 -N 5\"\" -B \"weka.classifiers.trees.DecisionStump \" -B \"weka.classifiers.meta.AttributeSelectedClassifier -E \"weka.attributeSelection.CfsSubsetEval \" -S \"weka.attributeSelection.BestFirst -D 1 -N 5\" -W weka.classifiers.trees.J48 -- -C 0.25 -M 2\" -train fromCSV.arff -split-percentage 1 -p 0 > wekaoutput.txt");
-
+*/
     const char* alglabel = argv[getargvindex("-a")+1];
     const char* algorithm = "weka.classifiers.meta.MultiScheme";
     const char* options = " -X 0 -S 1 -B \"weka.classifiers.rules.M5Rules -M 4.0\" -B \"weka.classifiers.trees.REPTree -M 2 -V 0.001 -N 3 -S 1 -L -1 -I 0.0\" -B \"weka.classifiers.trees.M5P -M 4.0\" -B \"weka.classifiers.lazy.LWL -U 0 -K -1 -A \"weka.core.neighboursearch.LinearNNSearch -A \\\"weka.core.EuclideanDistance -R first-last\\\"\" -W weka.classifiers.trees.DecisionStump\" -B \"weka.classifiers.lazy.KStar -B 20 -M a\" -B \"weka.classifiers.lazy.IBk -K 1 -W 0 -A \"weka.core.neighboursearch.LinearNNSearch -A \\\"weka.core.EuclideanDistance -R first-last\\\"\"\" -B \"weka.classifiers.functions.MultilayerPerceptron -L 0.3 -M 0.2 -N 500 -V 0 -S 0 -E 20 -H a\" -B \"weka.classifiers.functions.SMOreg -C 1.0 -N 0 -I \"weka.classifiers.functions.supportVector.RegSMOImproved -L 0.001 -W 1 -P 1.0E-12 -train 0.001 -V\" -K \"weka.classifiers.functions.supportVector.PolyKernel -C 250007 -E 1.0\"\" -B \"weka.classifiers.functions.SimpleLinearRegression \" -B \"weka.classifiers.rules.ZeroR \" -B \"weka.classifiers.meta.Bagging -P 100 -S 1 -num-slots 1 -I 10 -W weka.classifiers.trees.REPTree -- -M 2 -V 0.001 -N 3 -S 1 -L -1 -I 0.0\" -B \"weka.classifiers.functions.GaussianProcesses -L 1.0 -N 0 -K \"weka.classifiers.functions.supportVector.PolyKernel -C 250007 -E 1.0\"\" -B \"weka.classifiers.meta.RandomSubSpace -P 0.5 -S 1 -num-slots 1 -I 10 -W weka.classifiers.trees.REPTree -- -M 2 -V 0.001 -N 3 -S 1 -L -1 -I 0.0\" -B \"weka.classifiers.meta.CVParameterSelection -X 10 -S 1 -W weka.classifiers.rules.ZeroR\" -B \"weka.classifiers.meta.RegressionByDiscretization -B 10 -K 0 -W weka.classifiers.trees.J48 -- -C 0.25 -M 2\" -B \"weka.classifiers.meta.Stacking -X 10 -M \"weka.classifiers.rules.ZeroR \" -S 1 -num-slots 1 -B \"weka.classifiers.rules.ZeroR \"\" -B \"weka.classifiers.meta.Vote -S 1 -B \"weka.classifiers.rules.ZeroR \" -R AVG\" -B \"weka.classifiers.rules.DecisionTable -X 1 -S \"weka.attributeSelection.BestFirst -D 1 -N 5\"\" -B \"weka.classifiers.trees.DecisionStump \" -B \"weka.classifiers.meta.AttributeSelectedClassifier -E \"weka.attributeSelection.CfsSubsetEval \" -S \"weka.attributeSelection.BestFirst -D 1 -N 5\" -W weka.classifiers.trees.J48 -- -C 0.25 -M 2\" -train fromCSV.arff -split-percentage 1";
