@@ -19,6 +19,7 @@ used some info*/
 #include <string>
 #include <string.h>
 #include <stdio.h>
+#include <vector>
 using namespace std;
 using std::ctype;
 using std::string;
@@ -31,9 +32,11 @@ char ** argvptr;  //knowledge of copying argv from http://stackoverflow.com/ques
 std::string modelname;
 std::string wsyscall = "";
 
+int fieldspos;
+
 bool scanargv(char* parameter)
 {
-            int i = 1;
+    int i = 1;
 
     while (argvptr[i] != NULL)
     {
@@ -60,6 +63,7 @@ int getargvindex(char* parameter)
 
         i++;
     }
+    return NULL;
 }
 /*int countAA(const char* seq, int residue)
 {
@@ -78,6 +82,7 @@ int getargvindex(char* parameter)
         }
     }
 }*/
+
 int countAA(const char* seq, int residue)
 {
     int count = 0;
@@ -87,30 +92,37 @@ int countAA(const char* seq, int residue)
     while(i < seq_str.length())
     {
 //        printf("the length of the string is %d",seq_str.length());
-  //      cout << (char)seq_str.at(9);
-            if (seq_str.at(i) == residue)
-            {
-                count++;
-                i++;
-            }
-            else
-            {
-                i++;
-            }
+        //      cout << (char)seq_str.at(9);
+        if (seq_str.at(i) == residue)
+        {
+            count++;
+            i++;
+        }
+        else
+        {
+            i++;
+        }
     }
 
     return count;
 }
+string reorderline(string line)
+{
+
+    return line;
+}
 int main (int argc, char *argv[])
 {
+
     argvptr = argv;
     std::string filenamewithextdotarff;
+    std::string filenamewithext = argv[getargvindex("-train")+1];
+    std::string ext = filenamewithext.substr(filenamewithext.rfind("."),1024);
+    std::transform(ext.begin(), ext.end(),  ext.begin(), ::tolower);
     if (scanargv("-train"))
     {
 
-        std::string filenamewithext = argv[getargvindex("-train")+1];
-        std::string ext = filenamewithext.substr(filenamewithext.rfind("."),1024);
-        std::transform(ext.begin(), ext.end(),  ext.begin(), ::tolower);
+
         /*if (ext.compare("mzxml"))  //rfind will give the extension here
         {
             printf("true");
@@ -134,60 +146,158 @@ int main (int argc, char *argv[])
             fromCSV  << "@ATTRIBUTE mz  NUMERIC\n";
             fromCSV  << "@ATTRIBUTE charge  NUMERIC\n";
             fromCSV  << "@ATTRIBUTE intensity  NUMERIC\n";
-            fromCSV  << "@ATTRIBUTE A  NUMERIC\n";
-            fromCSV  << "@ATTRIBUTE R  NUMERIC\n";
-            fromCSV  << "@ATTRIBUTE N  NUMERIC\n";
-            fromCSV  << "@ATTRIBUTE D  NUMERIC\n";
-            fromCSV  << "@ATTRIBUTE B  NUMERIC\n";
-            fromCSV  << "@ATTRIBUTE C  NUMERIC\n";
-            fromCSV  << "@ATTRIBUTE E  NUMERIC\n";
-            fromCSV  << "@ATTRIBUTE Q  NUMERIC\n";
-            fromCSV  << "@ATTRIBUTE Z  NUMERIC\n";
-            fromCSV  << "@ATTRIBUTE G  NUMERIC\n";
-            fromCSV  << "@ATTRIBUTE H  NUMERIC\n";
-            fromCSV  << "@ATTRIBUTE I  NUMERIC\n";
-            fromCSV  << "@ATTRIBUTE L  NUMERIC\n";
-            fromCSV  << "@ATTRIBUTE K  NUMERIC\n";
-            fromCSV  << "@ATTRIBUTE M  NUMERIC\n";
-            fromCSV  << "@ATTRIBUTE F  NUMERIC\n";
-            fromCSV  << "@ATTRIBUTE P  NUMERIC\n";
-            fromCSV  << "@ATTRIBUTE S  NUMERIC\n";
-            fromCSV  << "@ATTRIBUTE T  NUMERIC\n";
-            fromCSV  << "@ATTRIBUTE W  NUMERIC\n";
-            fromCSV  << "@ATTRIBUTE Y  NUMERIC\n";
-            fromCSV  << "@ATTRIBUTE V  NUMERIC\n";//selenocysteine and pyrrolysine removed, add hydrophobicity attribute once calculated
             fromCSV  << "@ATTRIBUTE rt  NUMERIC\n\n";
             fromCSV  << "@DATA\n";
+
             //first line contains the differing fields, so scanning will take place here
             getline(csvfile,line);
-istringstream littlestream (line,istringstream::in);
+            istringstream littlestream (line,istringstream::in);
+            vector<char*> fields;
+            while (littlestream.good())
                 getline(littlestream,field,',');
-            while (csvfile.good())
-            {  //input file format seq mz intensity charge rt\
-                getline(csvfile,line);//idea from post:  http://www.cplusplus.com/forum/general/17771/
+            if(strcmp(field.c_str(),"seq")==0)
+            {
+                fromCSV  << "@ATTRIBUTE SEQ STRING\n";
+                fromCSV  << "@ATTRIBUTE A  NUMERIC\n";
+                fromCSV  << "@ATTRIBUTE R  NUMERIC\n";
+                fromCSV  << "@ATTRIBUTE N  NUMERIC\n";
+                fromCSV  << "@ATTRIBUTE D  NUMERIC\n";
+                fromCSV  << "@ATTRIBUTE B  NUMERIC\n";
+                fromCSV  << "@ATTRIBUTE C  NUMERIC\n";
+                fromCSV  << "@ATTRIBUTE E  NUMERIC\n";
+                fromCSV  << "@ATTRIBUTE Q  NUMERIC\n";
+                fromCSV  << "@ATTRIBUTE Z  NUMERIC\n";
+                fromCSV  << "@ATTRIBUTE G  NUMERIC\n";
+                fromCSV  << "@ATTRIBUTE H  NUMERIC\n";
+                fromCSV  << "@ATTRIBUTE I  NUMERIC\n";
+                fromCSV  << "@ATTRIBUTE L  NUMERIC\n";
+                fromCSV  << "@ATTRIBUTE K  NUMERIC\n";
+                fromCSV  << "@ATTRIBUTE M  NUMERIC\n";
+                fromCSV  << "@ATTRIBUTE F  NUMERIC\n";
+                fromCSV  << "@ATTRIBUTE P  NUMERIC\n";
+                fromCSV  << "@ATTRIBUTE S  NUMERIC\n";
+                fromCSV  << "@ATTRIBUTE T  NUMERIC\n";
+                fromCSV  << "@ATTRIBUTE W  NUMERIC\n";
+                fromCSV  << "@ATTRIBUTE Y  NUMERIC\n";
+                fromCSV  << "@ATTRIBUTE V  NUMERIC\n";//selenocysteine and pyrrolysine removed, add hydrophobicity attribute once calculated
+                fields[fieldspos] = "SEQ";
+                fieldspos++;
+                fields[fieldspos] = "A";
+                fieldspos++;
+                fields[fieldspos] = "R";
+                fieldspos++;
+                fields[fieldspos] = "N";
+                fieldspos++;
+                fields[fieldspos] = "D";
+                fieldspos++;
+                fields[fieldspos] = "B";
+                fieldspos++;
+                fields[fieldspos] = "C";
+                fieldspos++;
+                fields[fieldspos] = "E";
+                fieldspos++;
+                fields[fieldspos] = "G";
+                fieldspos++;
+                fields[fieldspos] = "H";
+                fieldspos++;
+                fields[fieldspos] = "I";
+                fieldspos++;
+                fields[fieldspos] = "L";
+                fieldspos++;
+                fields[fieldspos] = "K";
+                fieldspos++;
+                fields[fieldspos] = "M";
+                fieldspos++;
+                fields[fieldspos] = "F";
+                fieldspos++;
+                fields[fieldspos] = "P";
+                fieldspos++;
+                fields[fieldspos] = "S";
+                fieldspos++;
+                fields[fieldspos] = "T";
+                fieldspos++;
+                fields[fieldspos] = "W";
+                fieldspos++;
+                fields[fieldspos] = "Y";
+                fieldspos++;
+                fields[fieldspos] = "V";
+                fieldspos++;
 
+            }
+            else if(strcmp(field.c_str(),"mz")==0)
+            {
+                fields[fieldspos] = "mz";
+                fieldspos++;
+            }
+            else if(strcmp(field.c_str(),"charge")==0)
+            {
+                fields[fieldspos] = "charge";
+                fieldspos++;
+            }
+            else if(strcmp(field.c_str(),"intensity")==0)
+            {
+                fields[fieldspos] = "intensity";
+                fieldspos++;
+            }
+            else if(strcmp(field.c_str(),"rt")==0)
+            {
+                fields[fieldspos] = "rt";
+                fieldspos++;
+            }
+            //end istringstream of the first line (which contains the column labels)
+
+            while (csvfile.good())
+            {
+                //input file format seq mz intensity charge rt
+                getline(csvfile,line);//idea of parsing the individual lines (although that may be one of the intentions when the istreamstring class was written) from post:  http://www.cplusplus.com/forum/general/17771/
+                istringstream littlestream (line,istringstream::in);
+                int pos = 0;
+                std::string restructured_line = "";
+                while (littlestream.good())
+                {
+
+                    getline(littlestream,field,',');
+                    if(fields[pos] == "seq")
+                    {
+                        const char* seq_tmp = field.c_str();
+                        restructured_line.append(field).append(","); //this will append "SEQUENCE," to the line as the first item
+                        pos++;  //increments to the next field, which could be mz, intensity, or charge
+                        std::string acid = "ARNDBCEQZGHILKMFPSTWYV";
+                        int aapos = 0;
+
+                        while (acid[aapos] != '\0')
+{
+
+                        countAA(seq_tmp,acid.at(aapos));
+}
+                    }
+                    else
+                    {
+
+                    }
+                }
 
                 fromCSV << line << endl;
                 cout << line << endl;
             }
             fromCSV.close();
         }
-        else if (ext.compare("pepxml"))
-        {
-            printf("pepxml format is not yet supported in the current version of rtpredict");
-            return 0;
-        }
-        else if (ext.compare("mzxml"))
-        {
-            printf("mzxml format is not yet supported in the current version of rtpredict");
-            return 0;
-        }
-        else if (ext.compare("mzml"))
-        {
-            printf("mzml format is not yet supported in the current version of rtpredict");
-            return 0;
+    }
+    else if (ext.compare("pepxml"))
+    {
+        printf("pepxml format is not yet supported in the current version of rtpredict");
+        return 0;
+    }
+    else if (ext.compare("mzxml"))
+    {
+        printf("mzxml format is not yet supported in the current version of rtpredict");
+        return 0;
+    }
+    else if (ext.compare("mzml"))
+    {
+        printf("mzml format is not yet supported in the current version of rtpredict");
+        return 0;
 
-        }
     }
     else
     {
@@ -211,7 +321,7 @@ istringstream littlestream (line,istringstream::in);
         algorithm = "weka.classifiers.functions.GaussianProcesses";
         options = " -L 1.0 -N 0 -K \"weka.classifiers.functions.supportVector.PolyKernel -C 250007 -E 1.0\"";
     }
-    if (strcmp(alglabel,"best")){}//this is the default, no explicit declaration is therefore needed here
+    if (strcmp(alglabel,"best")) {} //this is the default, no explicit declaration is therefore needed here
     else if (strcmp(alglabel,"linreg"))
     {
         algorithm = "weka.classifiers.functions.LinearRegression";
@@ -315,60 +425,60 @@ istringstream littlestream (line,istringstream::in);
 //format for system call: java -classpath ./weka.jar -Xmx512m <algorithm> -train <filenamewithext>.arff > <filenamewithext>.txt
 //strcat reference code: http://www.cplusplus.com/reference/clibrary/cstring/strcat/
 
-    strcat (wsyscall,"java -classpath ./weka.jar -Xmx512m ");
+    wsyscall.append("java -classpath ./weka.jar -Xmx512m ");
     if(argv[getargvindex("-train")] != NULL)
     {
-        strcat (wsyscall,algorithm);
-        strcat (wsyscall,options);
-        strcat (wsyscall," -t ");
-        strcat (wsyscall,filenamewithextdotarff.c_str());
-        strcat (wsyscall,".arff ");
-        //strcat (wsyscall,argv[getargvindex("-train")+1]);
+        wsyscall.append(algorithm);
+        wsyscall.append(options);
+        wsyscall.append(" -t ");
+        wsyscall.append(filenamewithextdotarff.c_str());
+        wsyscall.append(".arff ");
+        //wsyscall.append(argv[getargvindex("-train")+1]);
     }
     if(argv[getargvindex("-storemodel")] != NULL)
     {
-        strcat (wsyscall,algorithm);
-        strcat (wsyscall," -d ");
-        strcat (wsyscall,filenamewithextdotarff.c_str());
-        strcat (wsyscall,".model ");
-        //strcat (wsyscall,argv[getargvindex("-storemodel")+1]);
+        wsyscall.append(algorithm);
+        wsyscall.append(" -d ");
+        wsyscall.append(filenamewithextdotarff.c_str());
+        wsyscall.append(".model ");
+        //wsyscall.append(argv[getargvindex("-storemodel")+1]);
     }
     if(argv[getargvindex("-loadmodel")] != NULL)
     {
-        strcat (wsyscall,algorithm);
-        strcat (wsyscall," -l ");
-         modelname = argv[getargvindex("-loadmodel")+1];
-        strcat (wsyscall,modelname);
-        //strcat (wsyscall,argv[getargvindex("-storemodel")+1]);
+        wsyscall.append(algorithm);
+        wsyscall.append(" -l ");
+        modelname = argv[getargvindex("-loadmodel")+1];
+        wsyscall.append(modelname);
+        //wsyscall.append(argv[getargvindex("-storemodel")+1]);
     }
-if(argv[getargvindex("-test")] != NULL)
-{
-std::string testfile = argv[getargvindex("-test")+1];   //by putting -test and selecting no testfile, automatic cross validation will occur, otherwise the provided testfile will be used
-        if (testfile != NULL)
+    if(argv[getargvindex("-test")] != NULL)
+    {
+        std::string testfile = argv[getargvindex("-test")+1];   //by putting -test and selecting no testfile, automatic cross validation will occur, otherwise the provided testfile will be used
+        if (testfile.c_str() != NULL)
         {
 
-        strcat (wsyscall," -T");
-        strcat (wsyscall,testfile);
+            wsyscall.append(" -T");
+            wsyscall.append(testfile);
         }
-}
-else//if the testfile is not specified, it assumes that there is one located in <modelname without .model>.arff
-{
-    if(argv[getargvindex("-loadmodel")] != NULL)
-    {
-std::string testfile = modelname.substr(0,modelname.rfind(".")-1);  //NOTE NEED TO SEE IF THIS TRUNCATES THE NAME BY ONE CHARACTER OR NOT
-        strcat(testfile,".arff");
-        strcat (wsyscall," -T");
-        strcat (wsyscall,);
-        std::string modelargv[getargvindex("-loadmodel")+1]
-        std::string name = filenamewithext.substr(filenamewithext.rfind("."),1024);
     }
-}
-    strcat(wsyscall,"-p 0 > _out.txt");
-    system(wsyscall);
+    else//if the testfile is not specified, it assumes that there is one located in <modelname without .model>.arff
+    {
+        if(argv[getargvindex("-loadmodel")] != NULL)
+        {
+            std::string testfile = modelname.substr(0,modelname.rfind(".")-1);  //NOTE NEED TO SEE IF THIS TRUNCATES THE NAME BY ONE CHARACTER OR NOT
+            testfile.append(".arff");
+            wsyscall.append(" -T ");
+            wsyscall.append(testfile);
+            std::string modelargv[getargvindex("-loadmodel")+1];
+            std::string name = filenamewithext.substr(filenamewithext.rfind("."),1024);
+        }
+    }
+    wsyscall.append("-p 0 > _out.txt");
+    system(wsyscall.c_str());
     return 0;
 }
 /*
-DOCUMENTATION:
+Retention Time Predictor
 usage rtpredict -train TRAININGFILE.EXT \n  Currently supported formats include: \n csv
 -train <filename>
 -test <testfile>  tests the given model on the data.  If -test is used with no file, 10 fold cross validation will occur.
