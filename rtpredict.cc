@@ -1,11 +1,10 @@
 //James Dalgleish
 //C++ retention time predictor-- RTPredict
 //basic file i/o may resemble tutorial code on: http://www.cprogramming.com/tutorial/c/lesson14.html
-//hrlog 11:46-12:00, 1:16-1:48
 /*
 #include<iostream>
 #include<stdio.h>
-
+#include<iterator>
 #include<string.h>
 #include<cctype>
 #include<algorithm>
@@ -28,7 +27,8 @@ using std::ifstream;
 using std::ofstream;
 using std::endl;
 using std::cout;
-char ** argvptr;  //knowledge of copying argv from http://stackoverflow.com/questions/4057961/how-traino-access-argv-from-outside-trainhe-main-function
+char ** argvptr;
+int argcptr;  //knowledge of copying argv from http://stackoverflow.com/questions/4057961/how-traino-access-argv-from-outside-trainhe-main-function
 std::string modelname;
 std::string wsyscall = "";
 
@@ -54,7 +54,7 @@ bool scanargv(char* parameter)
 int getargvindex(char* parameter)
 {
     int i = 1;
-    while (argvptr[i] != NULL)
+    while (i <= argcptr)
     {
         if (strcmp(parameter,argvptr[i])==0)
         {
@@ -63,7 +63,7 @@ int getargvindex(char* parameter)
 
         i++;
     }
-    return NULL;
+    return -1;
 }
 /*int countAA(const char* seq, int residue)
 {
@@ -89,7 +89,7 @@ int countAA(const char* seq, int residue)
     int i = 0;
     std::string seq_str = seq;
 //    std::string residue_str = residue;
-    while(i < seq_str.length())
+    while(i < int(seq_str.length()))
     {
 //        printf("the length of the string is %d",seq_str.length());
         //      cout << (char)seq_str.at(9);
@@ -115,22 +115,13 @@ int main (int argc, char *argv[])
 {
 
     argvptr = argv;
+    argcptr = argc;
     std::string filenamewithextdotarff;
     std::string filenamewithext = argv[getargvindex("-train")+1];
-    std::string ext = filenamewithext.substr(filenamewithext.rfind("."),1024);
+    std::string ext = filenamewithext.substr(filenamewithext.rfind("."),50);
     std::transform(ext.begin(), ext.end(),  ext.begin(), ::tolower);
     if (scanargv("-train"))
     {
-
-
-        /*if (ext.compare("mzxml"))  //rfind will give the extension here
-        {
-            printf("true");
-        }
-        else
-        {
-            printf("false");
-        }*/
         if (ext.compare("csv"))
         {
             std::string field = "";
@@ -139,10 +130,10 @@ int main (int argc, char *argv[])
             csvfile.open (argv[getargvindex("-train")+1]);
             std::string filenamewithextdotarff;
             std::string filename = argv[getargvindex("-train")+1];
-            std::copy( filename.begin(), filename.end(), back_inserter( filenamewithextdotarff ) );
-            filenamewithextdotarff.insert(filenamewithextdotarff.end(), std::string(".arff").begin(), std::string(".arff").end());
-            ofstream fromCSV(filenamewithextdotarff.c_str());
-            fromCSV  << "@RELATION ilist\n\n";
+            std::string dotarff = ".arff";
+            filenamewithextdotarff.insert(filenamewithextdotarff.end(), dotarff.begin(), dotarff.end());
+            ofstream ArffInputFromCSV(filenamewithextdotarff.c_str());
+            ArffInputFromCSV  << "@RELATION ilist\n\n";
 
 
             //first line contains the differing fields, so scanning will take place here
@@ -150,33 +141,34 @@ int main (int argc, char *argv[])
             istringstream littlestream (line,istringstream::in);
             vector<char*> fields;
             while (littlestream.good())
+            {
                 getline(littlestream,field,',');
             if(strcmp(field.c_str(),"seq")==0)
             {
-                fromCSV  << "@ATTRIBUTE SEQ STRING\n";
-                fromCSV  << "@ATTRIBUTE A  NUMERIC\n";
-                fromCSV  << "@ATTRIBUTE R  NUMERIC\n";
-                fromCSV  << "@ATTRIBUTE N  NUMERIC\n";
-                fromCSV  << "@ATTRIBUTE D  NUMERIC\n";
-                fromCSV  << "@ATTRIBUTE B  NUMERIC\n";
-                fromCSV  << "@ATTRIBUTE C  NUMERIC\n";
-                fromCSV  << "@ATTRIBUTE E  NUMERIC\n";
-                fromCSV  << "@ATTRIBUTE Q  NUMERIC\n";
-                fromCSV  << "@ATTRIBUTE Z  NUMERIC\n";
-                fromCSV  << "@ATTRIBUTE G  NUMERIC\n";
-                fromCSV  << "@ATTRIBUTE H  NUMERIC\n";
-                fromCSV  << "@ATTRIBUTE I  NUMERIC\n";
-                fromCSV  << "@ATTRIBUTE L  NUMERIC\n";
-                fromCSV  << "@ATTRIBUTE K  NUMERIC\n";
-                fromCSV  << "@ATTRIBUTE M  NUMERIC\n";
-                fromCSV  << "@ATTRIBUTE F  NUMERIC\n";
-                fromCSV  << "@ATTRIBUTE P  NUMERIC\n";
-                fromCSV  << "@ATTRIBUTE S  NUMERIC\n";
-                fromCSV  << "@ATTRIBUTE T  NUMERIC\n";
-                fromCSV  << "@ATTRIBUTE W  NUMERIC\n";
-                fromCSV  << "@ATTRIBUTE Y  NUMERIC\n";
-                fromCSV  << "@ATTRIBUTE V  NUMERIC\n";//selenocysteine and pyrrolysine removed, add hydrophobicity attribute once calculated
-                fields[fieldspos] = "SEQ";
+                ArffInputFromCSV  << "@ATTRIBUTE seq STRING\n";
+                ArffInputFromCSV  << "@ATTRIBUTE A  NUMERIC\n";
+                ArffInputFromCSV  << "@ATTRIBUTE R  NUMERIC\n";
+                ArffInputFromCSV  << "@ATTRIBUTE N  NUMERIC\n";
+                ArffInputFromCSV  << "@ATTRIBUTE D  NUMERIC\n";
+                ArffInputFromCSV  << "@ATTRIBUTE B  NUMERIC\n";
+                ArffInputFromCSV  << "@ATTRIBUTE C  NUMERIC\n";
+                ArffInputFromCSV  << "@ATTRIBUTE E  NUMERIC\n";
+                ArffInputFromCSV  << "@ATTRIBUTE Q  NUMERIC\n";
+                ArffInputFromCSV  << "@ATTRIBUTE Z  NUMERIC\n";
+                ArffInputFromCSV  << "@ATTRIBUTE G  NUMERIC\n";
+                ArffInputFromCSV  << "@ATTRIBUTE H  NUMERIC\n";
+                ArffInputFromCSV  << "@ATTRIBUTE I  NUMERIC\n";
+                ArffInputFromCSV  << "@ATTRIBUTE L  NUMERIC\n";
+                ArffInputFromCSV  << "@ATTRIBUTE K  NUMERIC\n";
+                ArffInputFromCSV  << "@ATTRIBUTE M  NUMERIC\n";
+                ArffInputFromCSV  << "@ATTRIBUTE F  NUMERIC\n";
+                ArffInputFromCSV  << "@ATTRIBUTE P  NUMERIC\n";
+                ArffInputFromCSV  << "@ATTRIBUTE S  NUMERIC\n";
+                ArffInputFromCSV  << "@ATTRIBUTE T  NUMERIC\n";
+                ArffInputFromCSV  << "@ATTRIBUTE W  NUMERIC\n";
+                ArffInputFromCSV  << "@ATTRIBUTE Y  NUMERIC\n";
+                ArffInputFromCSV  << "@ATTRIBUTE V  NUMERIC\n";//selenocysteine and pyrrolysine removed, add hydrophobicity attribute once calculated
+                fields[fieldspos] = "seq";
                 fieldspos++;
                 fields[fieldspos] = "A";
                 fieldspos++;
@@ -222,50 +214,54 @@ int main (int argc, char *argv[])
             }
             else if(strcmp(field.c_str(),"mz")==0)
             {
-                fromCSV  << "@ATTRIBUTE mz  NUMERIC\n";
+                ArffInputFromCSV  << "@ATTRIBUTE mz  NUMERIC\n";
                 fields[fieldspos] = "mz";
                 fieldspos++;
             }
             else if(strcmp(field.c_str(),"charge")==0)
             {
-                fromCSV  << "@ATTRIBUTE charge  NUMERIC\n";
+                ArffInputFromCSV  << "@ATTRIBUTE charge  NUMERIC\n";
                 fields[fieldspos] = "charge";
                 fieldspos++;
             }
             else if(strcmp(field.c_str(),"intensity")==0)
             {
-                fromCSV  << "@ATTRIBUTE intensity  NUMERIC\n";
+                ArffInputFromCSV  << "@ATTRIBUTE intensity  NUMERIC\n";
                 fields[fieldspos] = "intensity";
                 fieldspos++;
             }
             else if(strcmp(field.c_str(),"rt")==0)
             {
-                fromCSV  << "@ATTRIBUTE rt  NUMERIC\n\n";
+                ArffInputFromCSV  << "@ATTRIBUTE rt  NUMERIC\n\n";
                 fields[fieldspos] = "rt";
                 fieldspos++;
             }
-            fromCSV  << "@DATA\n";
+		}
+		            ArffInputFromCSV  << "@DATA\n";
+
             //end istringstream of the first line (which contains the column labels)
+int oldorder[4];
+                std::string restructured_line = "";
 
             while (csvfile.good())
             {
-                //input file format seq mz intensity charge rt
+                //input file format seq mz intensity charge rt -- on the top row
+                //this code restructures the headers of the CSV file
+                int mzpos, intensitypos, chargepos, seqpos, rtpos;
                 getline(csvfile,line);//idea of parsing the individual lines (although that may be one of the intentions when the istreamstring class was written) from post:  http://www.cplusplus.com/forum/general/17771/
                 istringstream littlestream (line,istringstream::in);
                 int pos = 0;
-                std::string restructured_line = "";
-                while (littlestream.good())
+                while (littlestream.good()) //begin parsing column headings
                 {
 
                     getline(littlestream,field,',');
-                    if(fields[pos] == "seq")
+                    if(strcmp(fields[pos],"seq")==0)
                     {
+						seqpos = pos;
                         const char* seq_tmp = field.c_str();
                         restructured_line.append(field).append(","); //this will append "SEQUENCE," to the line as the first item
-                        pos++;  //increments to the next field, which could be mz, intensity, or charge
                         std::string acid = "ARNDBCEQZGHILKMFPSTWYV";
                         int aapos = 0;
-
                         while (acid[aapos] != '\0')
                         {
                             char* aacountwithcomma = "";
@@ -274,18 +270,31 @@ int main (int argc, char *argv[])
                             aapos++;
                         }
                     }
-                    else
+                    else if (strcmp(fields[pos],"mz")==0 || strcmp(fields[pos],"intensity")==0 || strcmp(fields[pos],"rt")==0 || strcmp(fields[pos],"charge")==0)
                     {
                         restructured_line.append(field).append(",");
-
-
                     }
-                    restructured_line.erase(restructured_line.end());
+						pos++;  //increments to the next field, which could be mz, intensity, or charge
                 }
-                fromCSV << line << endl;
-                cout << line << endl;
+                restructured_line.erase(restructured_line.end());
+                ArffInputFromCSV << restructured_line << endl;
+                cout << restructured_line << endl; //first line (column headers end here)
+                //below: takes comma separated values in an old order and then puts into the correct order that the program will expect
+                istringstream arraymaker_restructured(restructured_line,arraymaker_restructured::in);
+                vector<std::string> restructuredV;
+
+                while (arraymaker_restructured.good())
+                {
+                std::string restruct = "";
+                getline(arraymaker_restructured::in,restruct,',');
+                restructuredV.push_back (restruct);
+			}
+
+                //if I know that the first column ought to be mz (learned by reading from restructured_line),
+                // then I have to figure out what column that used to be (from fields[stored value]), then read the appropriate,
             }
-            fromCSV.close();
+
+            ArffInputFromCSV.close();
         }
     }
     else if (ext.compare("pepxml"))
@@ -302,7 +311,6 @@ int main (int argc, char *argv[])
     {
         printf("mzml format is not yet supported in the current version of rtpredict");
         return 0;
-
     }
     else
     {
@@ -310,17 +318,17 @@ int main (int argc, char *argv[])
         return 0;
     }
     /*
-//system("java -classpath ./weka.jar weka.filters.supervised.instance.StratifiedRemoveFolds -i fromCSV.arff -o Train.arff -c last -N 4 -F 1 -V");
-    //system("java -classpath ./weka.jar weka.filters.supervised.instance.StratifiedRemoveFolds -i fromCSV.arff -o Test.arff -c last -N 4 -F 1");
+//system("java -classpath ./weka.jar weka.filters.supervised.instance.StratifiedRemoveFolds -i ArffInputFromCSV.arff -o Train.arff -c last -N 4 -F 1 -V");
+    //system("java -classpath ./weka.jar weka.filters.supervised.instance.StratifiedRemoveFolds -i ArffInputFromCSV.arff -o Test.arff -c last -N 4 -F 1");
 
-    //system("java -classpath ./weka.jar -Xmx512m weka.classifiers.functions.SMOreg -train fromCSV.arff -train fromCSV.arff -p 0 -C 1 -N 2 >> results.txt");
-    system("java -classpath ./weka.jar -Xmx512m weka.classifiers.rules.M5Rules -M 4.0 -train fromCSV.arff -o -split-percentage 1 > wekaoutput.txt");
+    //system("java -classpath ./weka.jar -Xmx512m weka.classifiers.functions.SMOreg -train ArffInputFromCSV.arff -train ArffInputFromCSV.arff -p 0 -C 1 -N 2 >> results.txt");
+    system("java -classpath ./weka.jar -Xmx512m weka.classifiers.rules.M5Rules -M 4.0 -train ArffInputFromCSV.arff -o -split-percentage 1 > wekaoutput.txt");
     //this will run all algorithms... some sort of limiting measure needs to be done, split validation to select the correct one before a real analysis is to take place.
-    system("java -classpath ./weka.jar -Xmx512m weka.classifiers.meta.MultiScheme -X 0 -S 1 -B \"weka.classifiers.rules.M5Rules -M 4.0\" -B \"weka.classifiers.trees.REPTree -M 2 -V 0.001 -N 3 -S 1 -L -1 -I 0.0\" -B \"weka.classifiers.trees.M5P -M 4.0\" -B \"weka.classifiers.lazy.LWL -U 0 -K -1 -A \"weka.core.neighboursearch.LinearNNSearch -A \\\"weka.core.EuclideanDistance -R first-last\\\"\" -W weka.classifiers.trees.DecisionStump\" -B \"weka.classifiers.lazy.KStar -B 20 -M a\" -B \"weka.classifiers.lazy.IBk -K 1 -W 0 -A \"weka.core.neighboursearch.LinearNNSearch -A \\\"weka.core.EuclideanDistance -R first-last\\\"\"\" -B \"weka.classifiers.functions.MultilayerPerceptron -L 0.3 -M 0.2 -N 500 -V 0 -S 0 -E 20 -H a\" -B \"weka.classifiers.functions.SMOreg -C 1.0 -N 0 -I \"weka.classifiers.functions.supportVector.RegSMOImproved -L 0.001 -W 1 -P 1.0E-12 -train 0.001 -V\" -K \"weka.classifiers.functions.supportVector.PolyKernel -C 250007 -E 1.0\"\" -B \"weka.classifiers.functions.SimpleLinearRegression \" -B \"weka.classifiers.rules.ZeroR \" -B \"weka.classifiers.meta.Bagging -P 100 -S 1 -num-slots 1 -I 10 -W weka.classifiers.trees.REPTree -- -M 2 -V 0.001 -N 3 -S 1 -L -1 -I 0.0\" -B \"weka.classifiers.functions.GaussianProcesses -L 1.0 -N 0 -K \"weka.classifiers.functions.supportVector.PolyKernel -C 250007 -E 1.0\"\" -B \"weka.classifiers.meta.RandomSubSpace -P 0.5 -S 1 -num-slots 1 -I 10 -W weka.classifiers.trees.REPTree -- -M 2 -V 0.001 -N 3 -S 1 -L -1 -I 0.0\" -B \"weka.classifiers.meta.CVParameterSelection -X 10 -S 1 -W weka.classifiers.rules.ZeroR\" -B \"weka.classifiers.meta.RegressionByDiscretization -B 10 -K 0 -W weka.classifiers.trees.J48 -- -C 0.25 -M 2\" -B \"weka.classifiers.meta.Stacking -X 10 -M \"weka.classifiers.rules.ZeroR \" -S 1 -num-slots 1 -B \"weka.classifiers.rules.ZeroR \"\" -B \"weka.classifiers.meta.Vote -S 1 -B \"weka.classifiers.rules.ZeroR \" -R AVG\" -B \"weka.classifiers.rules.DecisionTable -X 1 -S \"weka.attributeSelection.BestFirst -D 1 -N 5\"\" -B \"weka.classifiers.trees.DecisionStump \" -B \"weka.classifiers.meta.AttributeSelectedClassifier -E \"weka.attributeSelection.CfsSubsetEval \" -S \"weka.attributeSelection.BestFirst -D 1 -N 5\" -W weka.classifiers.trees.J48 -- -C 0.25 -M 2\" -train fromCSV.arff -split-percentage 1 -p 0 > wekaoutput.txt");
+    system("java -classpath ./weka.jar -Xmx512m weka.classifiers.meta.MultiScheme -X 0 -S 1 -B \"weka.classifiers.rules.M5Rules -M 4.0\" -B \"weka.classifiers.trees.REPTree -M 2 -V 0.001 -N 3 -S 1 -L -1 -I 0.0\" -B \"weka.classifiers.trees.M5P -M 4.0\" -B \"weka.classifiers.lazy.LWL -U 0 -K -1 -A \"weka.core.neighboursearch.LinearNNSearch -A \\\"weka.core.EuclideanDistance -R first-last\\\"\" -W weka.classifiers.trees.DecisionStump\" -B \"weka.classifiers.lazy.KStar -B 20 -M a\" -B \"weka.classifiers.lazy.IBk -K 1 -W 0 -A \"weka.core.neighboursearch.LinearNNSearch -A \\\"weka.core.EuclideanDistance -R first-last\\\"\"\" -B \"weka.classifiers.functions.MultilayerPerceptron -L 0.3 -M 0.2 -N 500 -V 0 -S 0 -E 20 -H a\" -B \"weka.classifiers.functions.SMOreg -C 1.0 -N 0 -I \"weka.classifiers.functions.supportVector.RegSMOImproved -L 0.001 -W 1 -P 1.0E-12 -train 0.001 -V\" -K \"weka.classifiers.functions.supportVector.PolyKernel -C 250007 -E 1.0\"\" -B \"weka.classifiers.functions.SimpleLinearRegression \" -B \"weka.classifiers.rules.ZeroR \" -B \"weka.classifiers.meta.Bagging -P 100 -S 1 -num-slots 1 -I 10 -W weka.classifiers.trees.REPTree -- -M 2 -V 0.001 -N 3 -S 1 -L -1 -I 0.0\" -B \"weka.classifiers.functions.GaussianProcesses -L 1.0 -N 0 -K \"weka.classifiers.functions.supportVector.PolyKernel -C 250007 -E 1.0\"\" -B \"weka.classifiers.meta.RandomSubSpace -P 0.5 -S 1 -num-slots 1 -I 10 -W weka.classifiers.trees.REPTree -- -M 2 -V 0.001 -N 3 -S 1 -L -1 -I 0.0\" -B \"weka.classifiers.meta.CVParameterSelection -X 10 -S 1 -W weka.classifiers.rules.ZeroR\" -B \"weka.classifiers.meta.RegressionByDiscretization -B 10 -K 0 -W weka.classifiers.trees.J48 -- -C 0.25 -M 2\" -B \"weka.classifiers.meta.Stacking -X 10 -M \"weka.classifiers.rules.ZeroR \" -S 1 -num-slots 1 -B \"weka.classifiers.rules.ZeroR \"\" -B \"weka.classifiers.meta.Vote -S 1 -B \"weka.classifiers.rules.ZeroR \" -R AVG\" -B \"weka.classifiers.rules.DecisionTable -X 1 -S \"weka.attributeSelection.BestFirst -D 1 -N 5\"\" -B \"weka.classifiers.trees.DecisionStump \" -B \"weka.classifiers.meta.AttributeSelectedClassifier -E \"weka.attributeSelection.CfsSubsetEval \" -S \"weka.attributeSelection.BestFirst -D 1 -N 5\" -W weka.classifiers.trees.J48 -- -C 0.25 -M 2\" -train ArffInputFromCSV.arff -split-percentage 1 -p 0 > wekaoutput.txt");
 */
     const char* alglabel = argv[getargvindex("-a")+1];
     const char* algorithm = "weka.classifiers.meta.MultiScheme";
-    const char* options = " -X 0 -S 1 -B \"weka.classifiers.rules.M5Rules -M 4.0\" -B \"weka.classifiers.trees.REPTree -M 2 -V 0.001 -N 3 -S 1 -L -1 -I 0.0\" -B \"weka.classifiers.trees.M5P -M 4.0\" -B \"weka.classifiers.lazy.LWL -U 0 -K -1 -A \"weka.core.neighboursearch.LinearNNSearch -A \\\"weka.core.EuclideanDistance -R first-last\\\"\" -W weka.classifiers.trees.DecisionStump\" -B \"weka.classifiers.lazy.KStar -B 20 -M a\" -B \"weka.classifiers.lazy.IBk -K 1 -W 0 -A \"weka.core.neighboursearch.LinearNNSearch -A \\\"weka.core.EuclideanDistance -R first-last\\\"\"\" -B \"weka.classifiers.functions.MultilayerPerceptron -L 0.3 -M 0.2 -N 500 -V 0 -S 0 -E 20 -H a\" -B \"weka.classifiers.functions.SMOreg -C 1.0 -N 0 -I \"weka.classifiers.functions.supportVector.RegSMOImproved -L 0.001 -W 1 -P 1.0E-12 -train 0.001 -V\" -K \"weka.classifiers.functions.supportVector.PolyKernel -C 250007 -E 1.0\"\" -B \"weka.classifiers.functions.SimpleLinearRegression \" -B \"weka.classifiers.rules.ZeroR \" -B \"weka.classifiers.meta.Bagging -P 100 -S 1 -num-slots 1 -I 10 -W weka.classifiers.trees.REPTree -- -M 2 -V 0.001 -N 3 -S 1 -L -1 -I 0.0\" -B \"weka.classifiers.functions.GaussianProcesses -L 1.0 -N 0 -K \"weka.classifiers.functions.supportVector.PolyKernel -C 250007 -E 1.0\"\" -B \"weka.classifiers.meta.RandomSubSpace -P 0.5 -S 1 -num-slots 1 -I 10 -W weka.classifiers.trees.REPTree -- -M 2 -V 0.001 -N 3 -S 1 -L -1 -I 0.0\" -B \"weka.classifiers.meta.CVParameterSelection -X 10 -S 1 -W weka.classifiers.rules.ZeroR\" -B \"weka.classifiers.meta.RegressionByDiscretization -B 10 -K 0 -W weka.classifiers.trees.J48 -- -C 0.25 -M 2\" -B \"weka.classifiers.meta.Stacking -X 10 -M \"weka.classifiers.rules.ZeroR \" -S 1 -num-slots 1 -B \"weka.classifiers.rules.ZeroR \"\" -B \"weka.classifiers.meta.Vote -S 1 -B \"weka.classifiers.rules.ZeroR \" -R AVG\" -B \"weka.classifiers.rules.DecisionTable -X 1 -S \"weka.attributeSelection.BestFirst -D 1 -N 5\"\" -B \"weka.classifiers.trees.DecisionStump \" -B \"weka.classifiers.meta.AttributeSelectedClassifier -E \"weka.attributeSelection.CfsSubsetEval \" -S \"weka.attributeSelection.BestFirst -D 1 -N 5\" -W weka.classifiers.trees.J48 -- -C 0.25 -M 2\" -train fromCSV.arff -split-percentage 1";
+    const char* options = " -X 0 -S 1 -B \"weka.classifiers.rules.M5Rules -M 4.0\" -B \"weka.classifiers.trees.REPTree -M 2 -V 0.001 -N 3 -S 1 -L -1 -I 0.0\" -B \"weka.classifiers.trees.M5P -M 4.0\" -B \"weka.classifiers.lazy.LWL -U 0 -K -1 -A \"weka.core.neighboursearch.LinearNNSearch -A \\\"weka.core.EuclideanDistance -R first-last\\\"\" -W weka.classifiers.trees.DecisionStump\" -B \"weka.classifiers.lazy.KStar -B 20 -M a\" -B \"weka.classifiers.lazy.IBk -K 1 -W 0 -A \"weka.core.neighboursearch.LinearNNSearch -A \\\"weka.core.EuclideanDistance -R first-last\\\"\"\" -B \"weka.classifiers.functions.MultilayerPerceptron -L 0.3 -M 0.2 -N 500 -V 0 -S 0 -E 20 -H a\" -B \"weka.classifiers.functions.SMOreg -C 1.0 -N 0 -I \"weka.classifiers.functions.supportVector.RegSMOImproved -L 0.001 -W 1 -P 1.0E-12 -train 0.001 -V\" -K \"weka.classifiers.functions.supportVector.PolyKernel -C 250007 -E 1.0\"\" -B \"weka.classifiers.functions.SimpleLinearRegression \" -B \"weka.classifiers.rules.ZeroR \" -B \"weka.classifiers.meta.Bagging -P 100 -S 1 -num-slots 1 -I 10 -W weka.classifiers.trees.REPTree -- -M 2 -V 0.001 -N 3 -S 1 -L -1 -I 0.0\" -B \"weka.classifiers.functions.GaussianProcesses -L 1.0 -N 0 -K \"weka.classifiers.functions.supportVector.PolyKernel -C 250007 -E 1.0\"\" -B \"weka.classifiers.meta.RandomSubSpace -P 0.5 -S 1 -num-slots 1 -I 10 -W weka.classifiers.trees.REPTree -- -M 2 -V 0.001 -N 3 -S 1 -L -1 -I 0.0\" -B \"weka.classifiers.meta.CVParameterSelection -X 10 -S 1 -W weka.classifiers.rules.ZeroR\" -B \"weka.classifiers.meta.RegressionByDiscretization -B 10 -K 0 -W weka.classifiers.trees.J48 -- -C 0.25 -M 2\" -B \"weka.classifiers.meta.Stacking -X 10 -M \"weka.classifiers.rules.ZeroR \" -S 1 -num-slots 1 -B \"weka.classifiers.rules.ZeroR \"\" -B \"weka.classifiers.meta.Vote -S 1 -B \"weka.classifiers.rules.ZeroR \" -R AVG\" -B \"weka.classifiers.rules.DecisionTable -X 1 -S \"weka.attributeSelection.BestFirst -D 1 -N 5\"\" -B \"weka.classifiers.trees.DecisionStump \" -B \"weka.classifiers.meta.AttributeSelectedClassifier -E \"weka.attributeSelection.CfsSubsetEval \" -S \"weka.attributeSelection.BestFirst -D 1 -N 5\" -W weka.classifiers.trees.J48 -- -C 0.25 -M 2\" -train ArffInputFromCSV.arff -split-percentage 1";
     if (strcmp(alglabel,"gaussian"))
     {
         algorithm = "weka.classifiers.functions.GaussianProcesses";
@@ -386,12 +394,12 @@ int main (int argc, char *argv[])
     else if (strcmp(alglabel,"stacking"))
     {
         algorithm = "weka.classifiers.meta.Stacking";
-        options = " -X 10 -M \"weka.classifiers.rules.ZeroR \" -S 1 -num-slots 1 -B \"weka.classifiers.rules.M5Rules -M 4.0\" -B \"weka.classifiers.trees.REPTree -M 2 -V 0.001 -N 3 -S 1 -L -1 -I 0.0\" -B \"weka.classifiers.trees.M5P -M 4.0\" -B \"weka.classifiers.lazy.LWL -U 0 -K -1 -A \"weka.core.neighboursearch.LinearNNSearch -A \\\"weka.core.EuclideanDistance -R first-last\\\"\" -W weka.classifiers.trees.DecisionStump\" -B \"weka.classifiers.lazy.KStar -B 20 -M a\" -B \"weka.classifiers.lazy.IBk -K 1 -W 0 -A \"weka.core.neighboursearch.LinearNNSearch -A \\\"weka.core.EuclideanDistance -R first-last\\\"\"\" -B \"weka.classifiers.functions.MultilayerPerceptron -L 0.3 -M 0.2 -N 500 -V 0 -S 0 -E 20 -H a\" -B \"weka.classifiers.functions.SMOreg -C 1.0 -N 0 -I \"weka.classifiers.functions.supportVector.RegSMOImproved -L 0.001 -W 1 -P 1.0E-12 -train 0.001 -V\" -K \"weka.classifiers.functions.supportVector.PolyKernel -C 250007 -E 1.0\"\" -B \"weka.classifiers.functions.SimpleLinearRegression \" -B \"weka.classifiers.rules.ZeroR \" -B \"weka.classifiers.meta.Bagging -P 100 -S 1 -num-slots 1 -I 10 -W weka.classifiers.trees.REPTree -- -M 2 -V 0.001 -N 3 -S 1 -L -1 -I 0.0\" -B \"weka.classifiers.functions.GaussianProcesses -L 1.0 -N 0 -K \"weka.classifiers.functions.supportVector.PolyKernel -C 250007 -E 1.0\"\" -B \"weka.classifiers.meta.RandomSubSpace -P 0.5 -S 1 -num-slots 1 -I 10 -W weka.classifiers.trees.REPTree -- -M 2 -V 0.001 -N 3 -S 1 -L -1 -I 0.0\" -B \"weka.classifiers.meta.CVParameterSelection -X 10 -S 1 -W weka.classifiers.rules.ZeroR\" -B \"weka.classifiers.meta.RegressionByDiscretization -B 10 -K 0 -W weka.classifiers.trees.J48 -- -C 0.25 -M 2\" -B \"weka.classifiers.meta.Stacking -X 10 -M \"weka.classifiers.rules.ZeroR \" -S 1 -num-slots 1 -B \"weka.classifiers.rules.ZeroR \"\" -B \"weka.classifiers.meta.Vote -S 1 -B \"weka.classifiers.rules.ZeroR \" -R AVG\" -B \"weka.classifiers.rules.DecisionTable -X 1 -S \"weka.attributeSelection.BestFirst -D 1 -N 5\"\" -B \"weka.classifiers.trees.DecisionStump \" -B \"weka.classifiers.meta.AttributeSelectedClassifier -E \"weka.attributeSelection.CfsSubsetEval \" -S \"weka.attributeSelection.BestFirst -D 1 -N 5\" -W weka.classifiers.trees.J48 -- -C 0.25 -M 2\" -train fromCSV.arff -split-percentage 1\"";
+        options = " -X 10 -M \"weka.classifiers.rules.ZeroR \" -S 1 -num-slots 1 -B \"weka.classifiers.rules.M5Rules -M 4.0\" -B \"weka.classifiers.trees.REPTree -M 2 -V 0.001 -N 3 -S 1 -L -1 -I 0.0\" -B \"weka.classifiers.trees.M5P -M 4.0\" -B \"weka.classifiers.lazy.LWL -U 0 -K -1 -A \"weka.core.neighboursearch.LinearNNSearch -A \\\"weka.core.EuclideanDistance -R first-last\\\"\" -W weka.classifiers.trees.DecisionStump\" -B \"weka.classifiers.lazy.KStar -B 20 -M a\" -B \"weka.classifiers.lazy.IBk -K 1 -W 0 -A \"weka.core.neighboursearch.LinearNNSearch -A \\\"weka.core.EuclideanDistance -R first-last\\\"\"\" -B \"weka.classifiers.functions.MultilayerPerceptron -L 0.3 -M 0.2 -N 500 -V 0 -S 0 -E 20 -H a\" -B \"weka.classifiers.functions.SMOreg -C 1.0 -N 0 -I \"weka.classifiers.functions.supportVector.RegSMOImproved -L 0.001 -W 1 -P 1.0E-12 -train 0.001 -V\" -K \"weka.classifiers.functions.supportVector.PolyKernel -C 250007 -E 1.0\"\" -B \"weka.classifiers.functions.SimpleLinearRegression \" -B \"weka.classifiers.rules.ZeroR \" -B \"weka.classifiers.meta.Bagging -P 100 -S 1 -num-slots 1 -I 10 -W weka.classifiers.trees.REPTree -- -M 2 -V 0.001 -N 3 -S 1 -L -1 -I 0.0\" -B \"weka.classifiers.functions.GaussianProcesses -L 1.0 -N 0 -K \"weka.classifiers.functions.supportVector.PolyKernel -C 250007 -E 1.0\"\" -B \"weka.classifiers.meta.RandomSubSpace -P 0.5 -S 1 -num-slots 1 -I 10 -W weka.classifiers.trees.REPTree -- -M 2 -V 0.001 -N 3 -S 1 -L -1 -I 0.0\" -B \"weka.classifiers.meta.CVParameterSelection -X 10 -S 1 -W weka.classifiers.rules.ZeroR\" -B \"weka.classifiers.meta.RegressionByDiscretization -B 10 -K 0 -W weka.classifiers.trees.J48 -- -C 0.25 -M 2\" -B \"weka.classifiers.meta.Stacking -X 10 -M \"weka.classifiers.rules.ZeroR \" -S 1 -num-slots 1 -B \"weka.classifiers.rules.ZeroR \"\" -B \"weka.classifiers.meta.Vote -S 1 -B \"weka.classifiers.rules.ZeroR \" -R AVG\" -B \"weka.classifiers.rules.DecisionTable -X 1 -S \"weka.attributeSelection.BestFirst -D 1 -N 5\"\" -B \"weka.classifiers.trees.DecisionStump \" -B \"weka.classifiers.meta.AttributeSelectedClassifier -E \"weka.attributeSelection.CfsSubsetEval \" -S \"weka.attributeSelection.BestFirst -D 1 -N 5\" -W weka.classifiers.trees.J48 -- -C 0.25 -M 2\" -train ArffInputFromCSV.arff -split-percentage 1\"";
     }
     else if (strcmp(alglabel,"vote"))
     {
         algorithm = "weka.classifiers.meta.Vote";
-        options = " -S 1 -B \"weka.classifiers.rules.M5Rules -M 4.0\" -B \"weka.classifiers.trees.REPTree -M 2 -V 0.001 -N 3 -S 1 -L -1 -I 0.0\" -B \"weka.classifiers.trees.M5P -M 4.0\" -B \"weka.classifiers.lazy.LWL -U 0 -K -1 -A \"weka.core.neighboursearch.LinearNNSearch -A \\\"weka.core.EuclideanDistance -R first-last\\\"\" -W weka.classifiers.trees.DecisionStump\" -B \"weka.classifiers.lazy.KStar -B 20 -M a\" -B \"weka.classifiers.lazy.IBk -K 1 -W 0 -A \"weka.core.neighboursearch.LinearNNSearch -A \\\"weka.core.EuclideanDistance -R first-last\\\"\"\" -B \"weka.classifiers.functions.MultilayerPerceptron -L 0.3 -M 0.2 -N 500 -V 0 -S 0 -E 20 -H a\" -B \"weka.classifiers.functions.SMOreg -C 1.0 -N 0 -I \"weka.classifiers.functions.supportVector.RegSMOImproved -L 0.001 -W 1 -P 1.0E-12 -train 0.001 -V\" -K \"weka.classifiers.functions.supportVector.PolyKernel -C 250007 -E 1.0\"\" -B \"weka.classifiers.functions.SimpleLinearRegression \" -B \"weka.classifiers.rules.ZeroR \" -B \"weka.classifiers.meta.Bagging -P 100 -S 1 -num-slots 1 -I 10 -W weka.classifiers.trees.REPTree -- -M 2 -V 0.001 -N 3 -S 1 -L -1 -I 0.0\" -B \"weka.classifiers.functions.GaussianProcesses -L 1.0 -N 0 -K \"weka.classifiers.functions.supportVector.PolyKernel -C 250007 -E 1.0\"\" -B \"weka.classifiers.meta.RandomSubSpace -P 0.5 -S 1 -num-slots 1 -I 10 -W weka.classifiers.trees.REPTree -- -M 2 -V 0.001 -N 3 -S 1 -L -1 -I 0.0\" -B \"weka.classifiers.meta.CVParameterSelection -X 10 -S 1 -W weka.classifiers.rules.ZeroR\" -B \"weka.classifiers.meta.RegressionByDiscretization -B 10 -K 0 -W weka.classifiers.trees.J48 -- -C 0.25 -M 2\" -B \"weka.classifiers.meta.Stacking -X 10 -M \"weka.classifiers.rules.ZeroR \" -S 1 -num-slots 1 -B \"weka.classifiers.rules.ZeroR \"\" -B \"weka.classifiers.meta.Vote -S 1 -B \"weka.classifiers.rules.ZeroR \" -R AVG\" -B \"weka.classifiers.rules.DecisionTable -X 1 -S \"weka.attributeSelection.BestFirst -D 1 -N 5\"\" -B \"weka.classifiers.trees.DecisionStump \" -B \"weka.classifiers.meta.AttributeSelectedClassifier -E \"weka.attributeSelection.CfsSubsetEval \" -S \"weka.attributeSelection.BestFirst -D 1 -N 5\" -W weka.classifiers.trees.J48 -- -C 0.25 -M 2\" -train fromCSV.arff -split-percentage 1\"";
+        options = " -S 1 -B \"weka.classifiers.rules.M5Rules -M 4.0\" -B \"weka.classifiers.trees.REPTree -M 2 -V 0.001 -N 3 -S 1 -L -1 -I 0.0\" -B \"weka.classifiers.trees.M5P -M 4.0\" -B \"weka.classifiers.lazy.LWL -U 0 -K -1 -A \"weka.core.neighboursearch.LinearNNSearch -A \\\"weka.core.EuclideanDistance -R first-last\\\"\" -W weka.classifiers.trees.DecisionStump\" -B \"weka.classifiers.lazy.KStar -B 20 -M a\" -B \"weka.classifiers.lazy.IBk -K 1 -W 0 -A \"weka.core.neighboursearch.LinearNNSearch -A \\\"weka.core.EuclideanDistance -R first-last\\\"\"\" -B \"weka.classifiers.functions.MultilayerPerceptron -L 0.3 -M 0.2 -N 500 -V 0 -S 0 -E 20 -H a\" -B \"weka.classifiers.functions.SMOreg -C 1.0 -N 0 -I \"weka.classifiers.functions.supportVector.RegSMOImproved -L 0.001 -W 1 -P 1.0E-12 -train 0.001 -V\" -K \"weka.classifiers.functions.supportVector.PolyKernel -C 250007 -E 1.0\"\" -B \"weka.classifiers.functions.SimpleLinearRegression \" -B \"weka.classifiers.rules.ZeroR \" -B \"weka.classifiers.meta.Bagging -P 100 -S 1 -num-slots 1 -I 10 -W weka.classifiers.trees.REPTree -- -M 2 -V 0.001 -N 3 -S 1 -L -1 -I 0.0\" -B \"weka.classifiers.functions.GaussianProcesses -L 1.0 -N 0 -K \"weka.classifiers.functions.supportVector.PolyKernel -C 250007 -E 1.0\"\" -B \"weka.classifiers.meta.RandomSubSpace -P 0.5 -S 1 -num-slots 1 -I 10 -W weka.classifiers.trees.REPTree -- -M 2 -V 0.001 -N 3 -S 1 -L -1 -I 0.0\" -B \"weka.classifiers.meta.CVParameterSelection -X 10 -S 1 -W weka.classifiers.rules.ZeroR\" -B \"weka.classifiers.meta.RegressionByDiscretization -B 10 -K 0 -W weka.classifiers.trees.J48 -- -C 0.25 -M 2\" -B \"weka.classifiers.meta.Stacking -X 10 -M \"weka.classifiers.rules.ZeroR \" -S 1 -num-slots 1 -B \"weka.classifiers.rules.ZeroR \"\" -B \"weka.classifiers.meta.Vote -S 1 -B \"weka.classifiers.rules.ZeroR \" -R AVG\" -B \"weka.classifiers.rules.DecisionTable -X 1 -S \"weka.attributeSelection.BestFirst -D 1 -N 5\"\" -B \"weka.classifiers.trees.DecisionStump \" -B \"weka.classifiers.meta.AttributeSelectedClassifier -E \"weka.attributeSelection.CfsSubsetEval \" -S \"weka.attributeSelection.BestFirst -D 1 -N 5\" -W weka.classifiers.trees.J48 -- -C 0.25 -M 2\" -train ArffInputFromCSV.arff -split-percentage 1\"";
     }
     else if (strcmp(alglabel,"inputmapped"))
     {
@@ -431,7 +439,7 @@ int main (int argc, char *argv[])
 //strcat reference code: http://www.cplusplus.com/reference/clibrary/cstring/strcat/
 
     wsyscall.append("java -classpath ./weka.jar -Xmx512m ");
-    if(argv[getargvindex("-train")] != NULL)
+    if(getargvindex("-train") != -1)
     {
         wsyscall.append(algorithm);
         wsyscall.append(options);
@@ -440,7 +448,7 @@ int main (int argc, char *argv[])
         wsyscall.append(".arff ");
         //wsyscall.append(argv[getargvindex("-train")+1]);
     }
-    if(argv[getargvindex("-storemodel")] != NULL)
+    if(getargvindex("-storemodel") != -1)
     {
         wsyscall.append(algorithm);
         wsyscall.append(" -d ");
@@ -448,7 +456,7 @@ int main (int argc, char *argv[])
         wsyscall.append(".model ");
         //wsyscall.append(argv[getargvindex("-storemodel")+1]);
     }
-    if(argv[getargvindex("-loadmodel")] != NULL)
+    if(getargvindex("-loadmodel") != -1)
     {
         wsyscall.append(algorithm);
         wsyscall.append(" -l ");
@@ -456,10 +464,10 @@ int main (int argc, char *argv[])
         wsyscall.append(modelname);
         //wsyscall.append(argv[getargvindex("-storemodel")+1]);
     }
-    if(argv[getargvindex("-test")] != NULL)
+    if(getargvindex("-test") != -1)
     {
         std::string testfile = argv[getargvindex("-test")+1];   //by putting -test and selecting no testfile, automatic cross validation will occur, otherwise the provided testfile will be used
-        if (testfile.c_str() != NULL)
+        if (testfile.c_str() != "")
         {
 
             wsyscall.append(" -T");
@@ -468,13 +476,13 @@ int main (int argc, char *argv[])
     }
     else//if the testfile is not specified, it assumes that there is one located in <modelname without .model>.arff
     {
-        if(argv[getargvindex("-loadmodel")] != NULL)
+        if(getargvindex("-loadmodel") != -1)
         {
             std::string testfile = modelname.substr(0,modelname.rfind(".")-1);  //NOTE NEED TO SEE IF THIS TRUNCATES THE NAME BY ONE CHARACTER OR NOT
             testfile.append(".arff");
             wsyscall.append(" -T ");
             wsyscall.append(testfile);
-            std::string modelargv[getargvindex("-loadmodel")+1];
+            std::string modelargv = argv[getargvindex("-loadmodel")+1];
             std::string name = filenamewithext.substr(filenamewithext.rfind("."),1024);
         }
     }
