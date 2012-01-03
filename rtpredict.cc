@@ -65,7 +65,21 @@ int getargvindex(char* parameter)
     }
     return -1;
 }
-/*int countAA(const char* seq, int residue)
+int getindex(char* stringtofind, vector<std::string> fields)
+{
+int i = 1;
+    while (i <= (fields.size() + 1))
+    {
+        if (strcmp(stringtofind,fields[i])==0)
+        {
+            return i;
+        }
+
+        i++;
+    }
+    return -1;
+    }
+    /*int countletter(const char* seq, int residue)
 {
     int count = 0;
     int i = 0;
@@ -83,7 +97,7 @@ int getargvindex(char* parameter)
     }
 }*/
 
-int countAA(const char* seq, int residue)
+int countletter(const char* seq, int residue)
 {
     int count = 0;
     int i = 0;
@@ -105,6 +119,20 @@ int countAA(const char* seq, int residue)
     }
 
     return count;
+}
+const char* countAA(const char* seq)
+{
+    std::string acid = "ARNDBCEQZGHILKMFPSTWYV";
+    std::string counts = "";
+    int aapos = 0;
+    while (acid[aapos] != '\0')
+    {
+        char* aacountwithcomma = "";
+        sprintf(aacountwithcomma,"%d,",countletter(seq,acid.at(aapos)));
+        counts.append(aacountwithcomma);  //this loop should put counts of all the amino acids right after the sequence
+        aapos++;
+    }
+    return counts.c_str();
 }
 string reorderline(string line)
 {
@@ -143,111 +171,111 @@ int main (int argc, char *argv[])
             while (littlestream.good())
             {
                 getline(littlestream,field,',');
-            if(strcmp(field.c_str(),"seq")==0)
-            {
-                ArffInputFromCSV  << "@ATTRIBUTE seq STRING\n";
-                ArffInputFromCSV  << "@ATTRIBUTE A  NUMERIC\n";
-                ArffInputFromCSV  << "@ATTRIBUTE R  NUMERIC\n";
-                ArffInputFromCSV  << "@ATTRIBUTE N  NUMERIC\n";
-                ArffInputFromCSV  << "@ATTRIBUTE D  NUMERIC\n";
-                ArffInputFromCSV  << "@ATTRIBUTE B  NUMERIC\n";
-                ArffInputFromCSV  << "@ATTRIBUTE C  NUMERIC\n";
-                ArffInputFromCSV  << "@ATTRIBUTE E  NUMERIC\n";
-                ArffInputFromCSV  << "@ATTRIBUTE Q  NUMERIC\n";
-                ArffInputFromCSV  << "@ATTRIBUTE Z  NUMERIC\n";
-                ArffInputFromCSV  << "@ATTRIBUTE G  NUMERIC\n";
-                ArffInputFromCSV  << "@ATTRIBUTE H  NUMERIC\n";
-                ArffInputFromCSV  << "@ATTRIBUTE I  NUMERIC\n";
-                ArffInputFromCSV  << "@ATTRIBUTE L  NUMERIC\n";
-                ArffInputFromCSV  << "@ATTRIBUTE K  NUMERIC\n";
-                ArffInputFromCSV  << "@ATTRIBUTE M  NUMERIC\n";
-                ArffInputFromCSV  << "@ATTRIBUTE F  NUMERIC\n";
-                ArffInputFromCSV  << "@ATTRIBUTE P  NUMERIC\n";
-                ArffInputFromCSV  << "@ATTRIBUTE S  NUMERIC\n";
-                ArffInputFromCSV  << "@ATTRIBUTE T  NUMERIC\n";
-                ArffInputFromCSV  << "@ATTRIBUTE W  NUMERIC\n";
-                ArffInputFromCSV  << "@ATTRIBUTE Y  NUMERIC\n";
-                ArffInputFromCSV  << "@ATTRIBUTE V  NUMERIC\n";//selenocysteine and pyrrolysine removed, add hydrophobicity attribute once calculated
-                fields[fieldspos] = "seq";
-                fieldspos++;
-                fields[fieldspos] = "A";
-                fieldspos++;
-                fields[fieldspos] = "R";
-                fieldspos++;
-                fields[fieldspos] = "N";
-                fieldspos++;
-                fields[fieldspos] = "D";
-                fieldspos++;
-                fields[fieldspos] = "B";
-                fieldspos++;
-                fields[fieldspos] = "C";
-                fieldspos++;
-                fields[fieldspos] = "E";
-                fieldspos++;
-                fields[fieldspos] = "G";
-                fieldspos++;
-                fields[fieldspos] = "H";
-                fieldspos++;
-                fields[fieldspos] = "I";
-                fieldspos++;
-                fields[fieldspos] = "L";
-                fieldspos++;
-                fields[fieldspos] = "K";
-                fieldspos++;
-                fields[fieldspos] = "M";
-                fieldspos++;
-                fields[fieldspos] = "F";
-                fieldspos++;
-                fields[fieldspos] = "P";
-                fieldspos++;
-                fields[fieldspos] = "S";
-                fieldspos++;
-                fields[fieldspos] = "T";
-                fieldspos++;
-                fields[fieldspos] = "W";
-                fieldspos++;
-                fields[fieldspos] = "Y";
-                fieldspos++;
-                fields[fieldspos] = "V";
-                fieldspos++;
+                if(strcmp(field.c_str(),"seq")==0)
+                {
+                    ArffInputFromCSV  << "@ATTRIBUTE seq STRING\n";
+                    ArffInputFromCSV  << "@ATTRIBUTE A  NUMERIC\n";
+                    ArffInputFromCSV  << "@ATTRIBUTE R  NUMERIC\n";
+                    ArffInputFromCSV  << "@ATTRIBUTE N  NUMERIC\n";
+                    ArffInputFromCSV  << "@ATTRIBUTE D  NUMERIC\n";
+                    ArffInputFromCSV  << "@ATTRIBUTE B  NUMERIC\n";
+                    ArffInputFromCSV  << "@ATTRIBUTE C  NUMERIC\n";
+                    ArffInputFromCSV  << "@ATTRIBUTE E  NUMERIC\n";
+                    ArffInputFromCSV  << "@ATTRIBUTE Q  NUMERIC\n";
+                    ArffInputFromCSV  << "@ATTRIBUTE Z  NUMERIC\n";
+                    ArffInputFromCSV  << "@ATTRIBUTE G  NUMERIC\n";
+                    ArffInputFromCSV  << "@ATTRIBUTE H  NUMERIC\n";
+                    ArffInputFromCSV  << "@ATTRIBUTE I  NUMERIC\n";
+                    ArffInputFromCSV  << "@ATTRIBUTE L  NUMERIC\n";
+                    ArffInputFromCSV  << "@ATTRIBUTE K  NUMERIC\n";
+                    ArffInputFromCSV  << "@ATTRIBUTE M  NUMERIC\n";
+                    ArffInputFromCSV  << "@ATTRIBUTE F  NUMERIC\n";
+                    ArffInputFromCSV  << "@ATTRIBUTE P  NUMERIC\n";
+                    ArffInputFromCSV  << "@ATTRIBUTE S  NUMERIC\n";
+                    ArffInputFromCSV  << "@ATTRIBUTE T  NUMERIC\n";
+                    ArffInputFromCSV  << "@ATTRIBUTE W  NUMERIC\n";
+                    ArffInputFromCSV  << "@ATTRIBUTE Y  NUMERIC\n";
+                    ArffInputFromCSV  << "@ATTRIBUTE V  NUMERIC\n";//selenocysteine and pyrrolysine removed, add hydrophobicity attribute once calculated
+                    fields[fieldspos] = "seq";
+                    fieldspos++;
+                    fields[fieldspos] = "A";
+                    fieldspos++;
+                    fields[fieldspos] = "R";
+                    fieldspos++;
+                    fields[fieldspos] = "N";
+                    fieldspos++;
+                    fields[fieldspos] = "D";
+                    fieldspos++;
+                    fields[fieldspos] = "B";
+                    fieldspos++;
+                    fields[fieldspos] = "C";
+                    fieldspos++;
+                    fields[fieldspos] = "E";
+                    fieldspos++;
+                    fields[fieldspos] = "G";
+                    fieldspos++;
+                    fields[fieldspos] = "H";
+                    fieldspos++;
+                    fields[fieldspos] = "I";
+                    fieldspos++;
+                    fields[fieldspos] = "L";
+                    fieldspos++;
+                    fields[fieldspos] = "K";
+                    fieldspos++;
+                    fields[fieldspos] = "M";
+                    fieldspos++;
+                    fields[fieldspos] = "F";
+                    fieldspos++;
+                    fields[fieldspos] = "P";
+                    fieldspos++;
+                    fields[fieldspos] = "S";
+                    fieldspos++;
+                    fields[fieldspos] = "T";
+                    fieldspos++;
+                    fields[fieldspos] = "W";
+                    fieldspos++;
+                    fields[fieldspos] = "Y";
+                    fieldspos++;
+                    fields[fieldspos] = "V";
+                    fieldspos++;
 
+                }
+                else if(strcmp(field.c_str(),"mz")==0)
+                {
+                    ArffInputFromCSV  << "@ATTRIBUTE mz  NUMERIC\n";
+                    fields[fieldspos] = "mz";
+                    fieldspos++;
+                }
+                else if(strcmp(field.c_str(),"charge")==0)
+                {
+                    ArffInputFromCSV  << "@ATTRIBUTE charge  NUMERIC\n";
+                    fields[fieldspos] = "charge";
+                    fieldspos++;
+                }
+                else if(strcmp(field.c_str(),"intensity")==0)
+                {
+                    ArffInputFromCSV  << "@ATTRIBUTE intensity  NUMERIC\n";
+                    fields[fieldspos] = "intensity";
+                    fieldspos++;
+                }
+                else if(strcmp(field.c_str(),"rt")==0)
+                {
+                    ArffInputFromCSV  << "@ATTRIBUTE rt  NUMERIC\n\n";
+                    fields[fieldspos] = "rt";
+                    fieldspos++;
+                }
             }
-            else if(strcmp(field.c_str(),"mz")==0)
-            {
-                ArffInputFromCSV  << "@ATTRIBUTE mz  NUMERIC\n";
-                fields[fieldspos] = "mz";
-                fieldspos++;
-            }
-            else if(strcmp(field.c_str(),"charge")==0)
-            {
-                ArffInputFromCSV  << "@ATTRIBUTE charge  NUMERIC\n";
-                fields[fieldspos] = "charge";
-                fieldspos++;
-            }
-            else if(strcmp(field.c_str(),"intensity")==0)
-            {
-                ArffInputFromCSV  << "@ATTRIBUTE intensity  NUMERIC\n";
-                fields[fieldspos] = "intensity";
-                fieldspos++;
-            }
-            else if(strcmp(field.c_str(),"rt")==0)
-            {
-                ArffInputFromCSV  << "@ATTRIBUTE rt  NUMERIC\n\n";
-                fields[fieldspos] = "rt";
-                fieldspos++;
-            }
-		}
-		            ArffInputFromCSV  << "@DATA\n";
+            ArffInputFromCSV  << "@DATA\n";
 
             //end istringstream of the first line (which contains the column labels)
-int oldorder[4];
-                std::string restructured_line = "";
+            int oldorder[4];
+            std::string restructured_line = "";
 
-            while (csvfile.good())
+            if (csvfile.good())
             {
                 //input file format seq mz intensity charge rt -- on the top row
                 //this code restructures the headers of the CSV file
-                int mzpos, intensitypos, chargepos, seqpos, rtpos;
+                int mzpos, intensitypos, chargepos, seqpos, rtpos;  //old positions of the given columns on the lines
                 getline(csvfile,line);//idea of parsing the individual lines (although that may be one of the intentions when the istreamstring class was written) from post:  http://www.cplusplus.com/forum/general/17771/
                 istringstream littlestream (line,istringstream::in);
                 int pos = 0;
@@ -257,7 +285,7 @@ int oldorder[4];
                     getline(littlestream,field,',');
                     if(strcmp(fields[pos],"seq")==0)
                     {
-						seqpos = pos;
+                        seqpos = pos;
                         const char* seq_tmp = field.c_str();
                         restructured_line.append(field).append(","); //this will append "SEQUENCE," to the line as the first item
                         std::string acid = "ARNDBCEQZGHILKMFPSTWYV";
@@ -265,7 +293,7 @@ int oldorder[4];
                         while (acid[aapos] != '\0')
                         {
                             char* aacountwithcomma = "";
-                            sprintf(aacountwithcomma,"%d,",countAA(seq_tmp,acid.at(aapos)));
+                            sprintf(aacountwithcomma,"%d,",countletter(seq_tmp,acid.at(aapos)));
                             restructured_line.append(aacountwithcomma);  //this loop should put counts of all the amino acids right after the sequence
                             aapos++;
                         }
@@ -274,24 +302,70 @@ int oldorder[4];
                     {
                         restructured_line.append(field).append(",");
                     }
-						pos++;  //increments to the next field, which could be mz, intensity, or charge
+                    pos++;  //increments to the next field, which could be mz, intensity, or charge
                 }
                 restructured_line.erase(restructured_line.end());
                 ArffInputFromCSV << restructured_line << endl;
                 cout << restructured_line << endl; //first line (column headers end here)
                 //below: takes comma separated values in an old order and then puts into the correct order that the program will expect
-                istringstream arraymaker_restructured(restructured_line,arraymaker_restructured::in);
-                vector<std::string> restructuredV;
-
-                while (arraymaker_restructured.good())
+                //fields already does this
+                while(csvfile.good())//get each line, converts the line to a char* vector, then outputs the line in the order specified by fields using mzpos/chargepos/etc
                 {
-                std::string restruct = "";
-                getline(arraymaker_restructured::in,restruct,',');
-                restructuredV.push_back (restruct);
-			}
+                    getline(csvfile,line);
+                    istringstream vectormaker_line (line, vectormaker_line::in);
+                    vector<std::string> lineV;
 
-                //if I know that the first column ought to be mz (learned by reading from restructured_line),
-                // then I have to figure out what column that used to be (from fields[stored value]), then read the appropriate,
+                    while (vectormaker_line.good())
+                    {
+                        std::string linetoken = "";
+                        getline(vectormaker_line,linetoken,',');
+                        lineV.push_back (linetoken);
+                    }
+                    //reorders the vector according to fields[], then writes it to restructured_line
+                    vector<std::string> tmp_V;
+                    tmp_V[getindex("seq",fields)] = lineV[seqpos];
+                    std::string acid = "ARNDBCEQZGHILKMFPSTWYV";
+                    int acidcounter = 0;
+                    while (acidcounter < acid.size())
+                    {
+                        acidcounter++;
+                        tmp_V[getindex(acid.subst(acidcounter,1),fields)] = lineV[seqpos + acidcounter];
+                     }
+                    tmp_V[getindex("mz",fields)] = lineV[mzpos];
+                    tmp_V[getindex("charge",fields)] = lineV[chargepos];
+                    tmp_V[getindex("intensity",fields)] = lineV[intensitypos];
+                    tmp_V[getindex("rt",fields)] = lineV[rtpos];
+                    restructured_line = "";
+                    //turning tmp_V into a line and writing it to restructured line
+                    for (i = 0; i <= tmp_V.size, i++) { restructured_line.append(tmp_V[i]).append(","); }
+                     restructured_line.erase(restructured_line.end());
+            ArffInputFromCSV  << restructured_line; //writes the restructured line to the arff
+            restructured_line = ""; //clears the restructured line at the end of each loop
+                    /*
+                                        i = 0;
+                    while (i <= fields.size)
+                        if (strcmp(fields[i],"mz")==0)
+                        {
+                            restructured_line.append(lineV[i]).append(",");
+                        }
+                    if (strcmp(fields[i],"charge")==0)
+                    {
+                        restructured_line.append(lineV[i]).append(",");
+                    }
+                    if (strcmp(fields[i],"intensity")==0)
+                    {
+                        restructured_line.append(lineV[i]).append(",");
+                    }
+                    if (strcmp(fields[i],"rt")==0)
+                    {
+                        restructured_line.append(lineV[i]).append(",");
+                    }
+                    if (strcmp(fields[i],"seq")==0)
+                    {
+                        restructured_line.append(lineV[i]).append(",");
+                    }
+                    */
+                }
             }
 
             ArffInputFromCSV.close();
@@ -318,14 +392,14 @@ int oldorder[4];
         return 0;
     }
     /*
-//system("java -classpath ./weka.jar weka.filters.supervised.instance.StratifiedRemoveFolds -i ArffInputFromCSV.arff -o Train.arff -c last -N 4 -F 1 -V");
+    //system("java -classpath ./weka.jar weka.filters.supervised.instance.StratifiedRemoveFolds -i ArffInputFromCSV.arff -o Train.arff -c last -N 4 -F 1 -V");
     //system("java -classpath ./weka.jar weka.filters.supervised.instance.StratifiedRemoveFolds -i ArffInputFromCSV.arff -o Test.arff -c last -N 4 -F 1");
 
     //system("java -classpath ./weka.jar -Xmx512m weka.classifiers.functions.SMOreg -train ArffInputFromCSV.arff -train ArffInputFromCSV.arff -p 0 -C 1 -N 2 >> results.txt");
     system("java -classpath ./weka.jar -Xmx512m weka.classifiers.rules.M5Rules -M 4.0 -train ArffInputFromCSV.arff -o -split-percentage 1 > wekaoutput.txt");
     //this will run all algorithms... some sort of limiting measure needs to be done, split validation to select the correct one before a real analysis is to take place.
     system("java -classpath ./weka.jar -Xmx512m weka.classifiers.meta.MultiScheme -X 0 -S 1 -B \"weka.classifiers.rules.M5Rules -M 4.0\" -B \"weka.classifiers.trees.REPTree -M 2 -V 0.001 -N 3 -S 1 -L -1 -I 0.0\" -B \"weka.classifiers.trees.M5P -M 4.0\" -B \"weka.classifiers.lazy.LWL -U 0 -K -1 -A \"weka.core.neighboursearch.LinearNNSearch -A \\\"weka.core.EuclideanDistance -R first-last\\\"\" -W weka.classifiers.trees.DecisionStump\" -B \"weka.classifiers.lazy.KStar -B 20 -M a\" -B \"weka.classifiers.lazy.IBk -K 1 -W 0 -A \"weka.core.neighboursearch.LinearNNSearch -A \\\"weka.core.EuclideanDistance -R first-last\\\"\"\" -B \"weka.classifiers.functions.MultilayerPerceptron -L 0.3 -M 0.2 -N 500 -V 0 -S 0 -E 20 -H a\" -B \"weka.classifiers.functions.SMOreg -C 1.0 -N 0 -I \"weka.classifiers.functions.supportVector.RegSMOImproved -L 0.001 -W 1 -P 1.0E-12 -train 0.001 -V\" -K \"weka.classifiers.functions.supportVector.PolyKernel -C 250007 -E 1.0\"\" -B \"weka.classifiers.functions.SimpleLinearRegression \" -B \"weka.classifiers.rules.ZeroR \" -B \"weka.classifiers.meta.Bagging -P 100 -S 1 -num-slots 1 -I 10 -W weka.classifiers.trees.REPTree -- -M 2 -V 0.001 -N 3 -S 1 -L -1 -I 0.0\" -B \"weka.classifiers.functions.GaussianProcesses -L 1.0 -N 0 -K \"weka.classifiers.functions.supportVector.PolyKernel -C 250007 -E 1.0\"\" -B \"weka.classifiers.meta.RandomSubSpace -P 0.5 -S 1 -num-slots 1 -I 10 -W weka.classifiers.trees.REPTree -- -M 2 -V 0.001 -N 3 -S 1 -L -1 -I 0.0\" -B \"weka.classifiers.meta.CVParameterSelection -X 10 -S 1 -W weka.classifiers.rules.ZeroR\" -B \"weka.classifiers.meta.RegressionByDiscretization -B 10 -K 0 -W weka.classifiers.trees.J48 -- -C 0.25 -M 2\" -B \"weka.classifiers.meta.Stacking -X 10 -M \"weka.classifiers.rules.ZeroR \" -S 1 -num-slots 1 -B \"weka.classifiers.rules.ZeroR \"\" -B \"weka.classifiers.meta.Vote -S 1 -B \"weka.classifiers.rules.ZeroR \" -R AVG\" -B \"weka.classifiers.rules.DecisionTable -X 1 -S \"weka.attributeSelection.BestFirst -D 1 -N 5\"\" -B \"weka.classifiers.trees.DecisionStump \" -B \"weka.classifiers.meta.AttributeSelectedClassifier -E \"weka.attributeSelection.CfsSubsetEval \" -S \"weka.attributeSelection.BestFirst -D 1 -N 5\" -W weka.classifiers.trees.J48 -- -C 0.25 -M 2\" -train ArffInputFromCSV.arff -split-percentage 1 -p 0 > wekaoutput.txt");
-*/
+    */
     const char* alglabel = argv[getargvindex("-a")+1];
     const char* algorithm = "weka.classifiers.meta.MultiScheme";
     const char* options = " -X 0 -S 1 -B \"weka.classifiers.rules.M5Rules -M 4.0\" -B \"weka.classifiers.trees.REPTree -M 2 -V 0.001 -N 3 -S 1 -L -1 -I 0.0\" -B \"weka.classifiers.trees.M5P -M 4.0\" -B \"weka.classifiers.lazy.LWL -U 0 -K -1 -A \"weka.core.neighboursearch.LinearNNSearch -A \\\"weka.core.EuclideanDistance -R first-last\\\"\" -W weka.classifiers.trees.DecisionStump\" -B \"weka.classifiers.lazy.KStar -B 20 -M a\" -B \"weka.classifiers.lazy.IBk -K 1 -W 0 -A \"weka.core.neighboursearch.LinearNNSearch -A \\\"weka.core.EuclideanDistance -R first-last\\\"\"\" -B \"weka.classifiers.functions.MultilayerPerceptron -L 0.3 -M 0.2 -N 500 -V 0 -S 0 -E 20 -H a\" -B \"weka.classifiers.functions.SMOreg -C 1.0 -N 0 -I \"weka.classifiers.functions.supportVector.RegSMOImproved -L 0.001 -W 1 -P 1.0E-12 -train 0.001 -V\" -K \"weka.classifiers.functions.supportVector.PolyKernel -C 250007 -E 1.0\"\" -B \"weka.classifiers.functions.SimpleLinearRegression \" -B \"weka.classifiers.rules.ZeroR \" -B \"weka.classifiers.meta.Bagging -P 100 -S 1 -num-slots 1 -I 10 -W weka.classifiers.trees.REPTree -- -M 2 -V 0.001 -N 3 -S 1 -L -1 -I 0.0\" -B \"weka.classifiers.functions.GaussianProcesses -L 1.0 -N 0 -K \"weka.classifiers.functions.supportVector.PolyKernel -C 250007 -E 1.0\"\" -B \"weka.classifiers.meta.RandomSubSpace -P 0.5 -S 1 -num-slots 1 -I 10 -W weka.classifiers.trees.REPTree -- -M 2 -V 0.001 -N 3 -S 1 -L -1 -I 0.0\" -B \"weka.classifiers.meta.CVParameterSelection -X 10 -S 1 -W weka.classifiers.rules.ZeroR\" -B \"weka.classifiers.meta.RegressionByDiscretization -B 10 -K 0 -W weka.classifiers.trees.J48 -- -C 0.25 -M 2\" -B \"weka.classifiers.meta.Stacking -X 10 -M \"weka.classifiers.rules.ZeroR \" -S 1 -num-slots 1 -B \"weka.classifiers.rules.ZeroR \"\" -B \"weka.classifiers.meta.Vote -S 1 -B \"weka.classifiers.rules.ZeroR \" -R AVG\" -B \"weka.classifiers.rules.DecisionTable -X 1 -S \"weka.attributeSelection.BestFirst -D 1 -N 5\"\" -B \"weka.classifiers.trees.DecisionStump \" -B \"weka.classifiers.meta.AttributeSelectedClassifier -E \"weka.attributeSelection.CfsSubsetEval \" -S \"weka.attributeSelection.BestFirst -D 1 -N 5\" -W weka.classifiers.trees.J48 -- -C 0.25 -M 2\" -train ArffInputFromCSV.arff -split-percentage 1";
