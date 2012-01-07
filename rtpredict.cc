@@ -34,13 +34,14 @@ std::string wsyscall = "";
 
 int fieldspos;
 
-bool scanargv(const char* parameter)
+bool scanargv(std::string parameter)
 {
     int i = 1;
-
-    while (argvptr[i] != NULL)
+    std::string argvptri = "";
+    while (argcptr != 0)
     {
-        if (strcmp(parameter,argvptr[i])==0)
+        argvptri = argvptr[i];
+        if (parameter.compare(argvptr[i])==0)
         {
             return true;
         }
@@ -51,16 +52,17 @@ bool scanargv(const char* parameter)
         i++;
     }
 }
-int getargvindex(const char* parameter)
+int getargvindex(std::string parameter)
 {
     int i = 0;
+    std::string argvptri = "";
     while (i <= argcptr)
     {
-        if (strcmp(parameter,argvptr[i])==0)
+        argvptri = argvptr[i];
+        if (parameter.compare(argvptri))
         {
             return i;
         }
-
         i++;
     }
     return -1;
@@ -110,10 +112,10 @@ const char* countAA(const char* seq)
     std::string acid = "ARNDBCEQZGHILKMFPSTWYV";
     std::string counts = "";
     int aapos = 0;
-    while (acid[aapos] != '\0')
+    while (acid.at(aapos) != '\0')
     {
-        const char* aacountwithcomma = "";
-        sprintf(const_cast<char*>(aacountwithcomma),"%d,",countletter(seq,acid.at(aapos)));
+        std::string aacountwithcomma = "";
+        sprintf(const_cast<char*>(aacountwithcomma.c_str()),"%d,",countletter(seq,acid.at(aapos)));
         counts.append(aacountwithcomma);  //this loop should put counts of all the amino acids right after the sequence
         aapos++;
     }
@@ -124,13 +126,14 @@ string reorderline(string line)
 
     return line;
 }
-int main (int argc,const char *argv[])
+int main (int argc, const char* argv[])
 {
 
     argvptr = argv;
     argcptr = argc;
-    std::string filenamewithextdotarff;
-    std::string filenamewithext = argv[getargvindex("-train")+1];
+    std::string filenamewithextdotarff = "";
+    std::string train = "-train";
+    std::string filenamewithext = argv[getargvindex(train)+1];
     std::string ext = filenamewithext.substr(filenamewithext.rfind("."),50);
     std::transform(ext.begin(), ext.end(),  ext.begin(), ::tolower);
     if (scanargv("-train"))
@@ -156,7 +159,7 @@ int main (int argc,const char *argv[])
             while (littlestream.good())
             {
                 getline(littlestream,field,',');
-                if(strcmp(field.c_str(),"seq")==0)
+                if(field.compare("seq"))
                 {
                     ArffInputFromCSV  << "@ATTRIBUTE seq STRING\n";
                     ArffInputFromCSV  << "@ATTRIBUTE A  NUMERIC\n";
@@ -225,25 +228,25 @@ int main (int argc,const char *argv[])
                     fieldspos++;
 
                 }
-                else if(strcmp(field.c_str(),"mz")==0)
+                else if(field.compare("mz"))
                 {
                     ArffInputFromCSV  << "@ATTRIBUTE mz  NUMERIC\n";
                     fields[fieldspos] = "mz";
                     fieldspos++;
                 }
-                else if(strcmp(field.c_str(),"charge")==0)
+                else if(field.compare("charge"))
                 {
                     ArffInputFromCSV  << "@ATTRIBUTE charge  NUMERIC\n";
                     fields[fieldspos] = "charge";
                     fieldspos++;
                 }
-                else if(strcmp(field.c_str(),"intensity")==0)
+                else if(field.compare("intensity"))
                 {
                     ArffInputFromCSV  << "@ATTRIBUTE intensity  NUMERIC\n";
                     fields[fieldspos] = "intensity";
                     fieldspos++;
                 }
-                else if(strcmp(field.c_str(),"rt")==0)
+                else if(field.compare("rt"))
                 {
                     ArffInputFromCSV  << "@ATTRIBUTE rt  NUMERIC\n\n";
                     fields[fieldspos] = "rt";
@@ -253,14 +256,13 @@ int main (int argc,const char *argv[])
             ArffInputFromCSV  << "@DATA\n";
 
             //end istringstream of the first line (which contains the column labels)
-            int oldorder[4];
             std::string restructured_line = "";
 
             if (csvfile.good())
             {
                 //input file format seq mz intensity charge rt -- on the top row
                 //this code restructures the headers of the CSV file
-                int mzpos, intensitypos, chargepos, seqpos, rtpos;  //old positions of the given columns on the lines
+                static int mzpos, intensitypos, chargepos, seqpos, rtpos;  //old positions of the given columns on the lines
                 getline(csvfile,line);//idea of parsing the individual lines (although that may be one of the intentions when the istreamstring class was written) from post:  http://www.cplusplus.com/forum/general/17771/
                 istringstream littlestream (line,istringstream::in);
                 int pos = 0;
@@ -277,8 +279,10 @@ int main (int argc,const char *argv[])
                         int aapos = 0;
                         while (acid[aapos] != '\0')
                         {
-                            const char* aacountwithcomma = "";
-                            sprintf(const_cast<char*>(aacountwithcomma),"%d,",countletter(seq_tmp,acid.at(aapos)));
+
+
+                                    std::string aacountwithcomma = "";
+        sprintf(const_cast<char*>(aacountwithcomma.c_str()),"%d,",countletter(seq_tmp,acid.at(aapos)));
                             restructured_line.append(aacountwithcomma);  //this loop should put counts of all the amino acids right after the sequence
                             aapos++;
                         }
@@ -307,7 +311,8 @@ int main (int argc,const char *argv[])
                         lineV.push_back (linetoken);
                     }
                     //reorders the vector according to fields[], then writes it to restructured_line
-                    vector<std::string> tmp_V;
+                    vector<std::string> tmp_V; tmp_V.resize(lineV.size());
+
 
                     tmp_V[getindex("seq",fields)] = lineV[seqpos];
                     std::string acid = "ARNDBCEQZGHILKMFPSTWYV";
@@ -324,7 +329,7 @@ int main (int argc,const char *argv[])
                     tmp_V[getindex("rt",fields)] = lineV[rtpos];
                     restructured_line = "";
                     //turning tmp_V into a line and writing it to restructured line
-                    for (int q = 0; q <= tmp_V.size(); q++)
+                    for (int q = 0; q < tmp_V.size(); q++)
                      {
                           restructured_line.append(tmp_V[q]).append(",");
                     }
