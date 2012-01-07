@@ -27,14 +27,14 @@ using std::ifstream;
 using std::ofstream;
 using std::endl;
 using std::cout;
-char ** argvptr;
+const char ** argvptr;
 int argcptr;  //knowledge of copying argv from http://stackoverflow.com/questions/4057961/how-traino-access-argv-from-outside-trainhe-main-function
 std::string modelname;
 std::string wsyscall = "";
 
 int fieldspos;
 
-bool scanargv(char* parameter)
+bool scanargv(const char* parameter)
 {
     int i = 1;
 
@@ -51,9 +51,9 @@ bool scanargv(char* parameter)
         i++;
     }
 }
-int getargvindex(char* parameter)
+int getargvindex(const char* parameter)
 {
-    int i = 1;
+    int i = 0;
     while (i <= argcptr)
     {
         if (strcmp(parameter,argvptr[i])==0)
@@ -65,9 +65,9 @@ int getargvindex(char* parameter)
     }
     return -1;
 }
-int getindex(char* stringtofind, vector<char*> fields)
+int getindex(const char* stringtofind, vector<const char*> fields)
 {
-int i = 1;
+int i = 0;
 std::string stf = stringtofind;
     while (i <= (fields.size() + 1))
     {
@@ -112,8 +112,8 @@ const char* countAA(const char* seq)
     int aapos = 0;
     while (acid[aapos] != '\0')
     {
-        char* aacountwithcomma = "";
-        sprintf(aacountwithcomma,"%d,",countletter(seq,acid.at(aapos)));
+        const char* aacountwithcomma = "";
+        sprintf(const_cast<char*>(aacountwithcomma),"%d,",countletter(seq,acid.at(aapos)));
         counts.append(aacountwithcomma);  //this loop should put counts of all the amino acids right after the sequence
         aapos++;
     }
@@ -124,7 +124,7 @@ string reorderline(string line)
 
     return line;
 }
-int main (int argc, char *argv[])
+int main (int argc,const char *argv[])
 {
 
     argvptr = argv;
@@ -152,7 +152,7 @@ int main (int argc, char *argv[])
             //first line contains the differing fields, so scanning will take place here
             getline(csvfile,line);
             istringstream littlestream (line,istringstream::in);
-            vector<char*> fields;
+            vector<const char*> fields;
             while (littlestream.good())
             {
                 getline(littlestream,field,',');
@@ -277,8 +277,8 @@ int main (int argc, char *argv[])
                         int aapos = 0;
                         while (acid[aapos] != '\0')
                         {
-                            char* aacountwithcomma = "";
-                            sprintf(aacountwithcomma,"%d,",countletter(seq_tmp,acid.at(aapos)));
+                            const char* aacountwithcomma = "";
+                            sprintf(const_cast<char*>(aacountwithcomma),"%d,",countletter(seq_tmp,acid.at(aapos)));
                             restructured_line.append(aacountwithcomma);  //this loop should put counts of all the amino acids right after the sequence
                             aapos++;
                         }
@@ -315,7 +315,7 @@ int main (int argc, char *argv[])
                     while (acidcounter < acid.size())
                     {
                         acidcounter++;
-                        char* aaonecharacterstring = const_cast<char*>(acid.substr(acidcounter,1).c_str());
+                        const char* aaonecharacterstring = acid.substr(acidcounter,1).c_str();
                         tmp_V[getindex(aaonecharacterstring,fields)] = lineV[seqpos + acidcounter];
                      }
                     tmp_V[getindex("mz",fields)] = lineV[mzpos];
