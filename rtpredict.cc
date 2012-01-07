@@ -65,12 +65,13 @@ int getargvindex(char* parameter)
     }
     return -1;
 }
-int getindex(char* stringtofind, vector<std::string> fields)
+int getindex(char* stringtofind, vector<char*> fields)
 {
 int i = 1;
+std::string stf = stringtofind;
     while (i <= (fields.size() + 1))
     {
-        if (strcmp(stringtofind,fields[i])==0)
+        if (stf.compare(fields[i]))
         {
             return i;
         }
@@ -79,23 +80,7 @@ int i = 1;
     }
     return -1;
     }
-    /*int countletter(const char* seq, int residue)
-{
-    int count = 0;
-    int i = 0;
-    while (seq[i] != '\0' || i == 0)
-    {
-        if(seq[i]==residue)
-        {
-            count++;
-            i++;
-        }
-        else
-        {
-            i++;
-        }
-    }
-}*/
+
 
 int countletter(const char* seq, int residue)
 {
@@ -312,7 +297,7 @@ int main (int argc, char *argv[])
                 while(csvfile.good())//get each line, converts the line to a char* vector, then outputs the line in the order specified by fields using mzpos/chargepos/etc
                 {
                     getline(csvfile,line);
-                    istringstream vectormaker_line (line, vectormaker_line::in);
+                    istringstream vectormaker_line (line, istringstream::in);
                     vector<std::string> lineV;
 
                     while (vectormaker_line.good())
@@ -323,13 +308,15 @@ int main (int argc, char *argv[])
                     }
                     //reorders the vector according to fields[], then writes it to restructured_line
                     vector<std::string> tmp_V;
+
                     tmp_V[getindex("seq",fields)] = lineV[seqpos];
                     std::string acid = "ARNDBCEQZGHILKMFPSTWYV";
                     int acidcounter = 0;
                     while (acidcounter < acid.size())
                     {
                         acidcounter++;
-                        tmp_V[getindex(acid.subst(acidcounter,1),fields)] = lineV[seqpos + acidcounter];
+                        char* aaonecharacterstring = const_cast<char*>(acid.substr(acidcounter,1).c_str());
+                        tmp_V[getindex(aaonecharacterstring,fields)] = lineV[seqpos + acidcounter];
                      }
                     tmp_V[getindex("mz",fields)] = lineV[mzpos];
                     tmp_V[getindex("charge",fields)] = lineV[chargepos];
@@ -337,7 +324,10 @@ int main (int argc, char *argv[])
                     tmp_V[getindex("rt",fields)] = lineV[rtpos];
                     restructured_line = "";
                     //turning tmp_V into a line and writing it to restructured line
-                    for (i = 0; i <= tmp_V.size, i++) { restructured_line.append(tmp_V[i]).append(","); }
+                    for (int q = 0; q <= tmp_V.size(); q++)
+                     {
+                          restructured_line.append(tmp_V[q]).append(",");
+                    }
                      restructured_line.erase(restructured_line.end());
             ArffInputFromCSV  << restructured_line; //writes the restructured line to the arff
             restructured_line = ""; //clears the restructured line at the end of each loop
