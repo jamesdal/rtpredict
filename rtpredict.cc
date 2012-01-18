@@ -27,8 +27,10 @@ using std::ifstream;
 using std::ofstream;
 using std::endl;
 using std::cout;
+
 const char ** argvptr;
-int argcptr;  //knowledge of copying argv from http://stackoverflow.com/questions/4057961/how-traino-access-argv-from-outside-trainhe-main-function
+
+int argcint;  //knowledge of copying argv from http://stackoverflow.com/questions/4057961/how-traino-access-argv-from-outside-trainhe-main-function
 std::string modelname;
 std::string wsyscall = "";
 
@@ -38,7 +40,7 @@ bool scanargv(std::string parameter)
 {
     int i = 1;
     std::string argvptri = "";
-    while (argcptr != 0)
+    while (argcint != 0)
     {
         argvptri = argvptr[i];
         if (parameter.compare(argvptr[i])==0)
@@ -51,17 +53,24 @@ bool scanargv(std::string parameter)
         }
         i++;
     }
+	return false;
 }
 int getargvindex(std::string parameter)
 {
     int i = 0;
     std::string argvptri = "";
-    while (i <= argcptr)
+cout << i << " " << *argvptr << " " << argvptri << " " << parameter << endl;
+    while (i < argcint)
     {
+cout << i << " " << *argvptr << " " << argvptri << " " << parameter << endl;
+
         argvptri = argvptr[i];
-        if (parameter.compare(argvptri))
+        if (parameter == argvptri)
         {
+cout << i << " " << *argvptr << " " << argvptri << " " << parameter << endl;
+
             return i;
+
         }
         i++;
     }
@@ -71,7 +80,7 @@ int getindex(const char* stringtofind, vector<const char*> fields)
 {
 int i = 0;
 std::string stf = stringtofind;
-    while (i <= (fields.size() + 1))
+    while (i <= ((int)(fields.size()) + 1))
     {
         if (stf.compare(fields[i]))
         {
@@ -130,11 +139,12 @@ int main (int argc, const char* argv[])
 {
 
     argvptr = argv;
-    argcptr = argc;
-    std::string filenamewithextdotarff = "";
+    argcint = argc;
+    string filenamewithextdotarff("");
     std::string train = "-train";
-    std::string filenamewithext = argv[getargvindex(train)+1];
-    std::string ext = filenamewithext.substr(filenamewithext.rfind("."),50);
+    static std::string filenamewithext = argv[getargvindex(train)+1];
+    printf("I just got past the first line");
+    std::string ext = filenamewithext.substr((int)filenamewithext.rfind("."),50);
     std::transform(ext.begin(), ext.end(),  ext.begin(), ::tolower);
     if (scanargv("-train"))
     {
@@ -143,9 +153,13 @@ int main (int argc, const char* argv[])
             std::string field = "";
             string line;  //some code may resemble samples on http://www.cplusplus.com/doc/tutorial/files/
             ifstream csvfile;
-            csvfile.open (argv[getargvindex("-train")+1]);
-            std::string filenamewithextdotarff;
-            std::string filename = argv[getargvindex("-train")+1];
+            csvfile.open (filenamewithext.c_str());
+                printf("I just got past the second line");
+
+            std::string filenamewithextdotarff = filenamewithext;
+            cout << filenamewithextdotarff << filenamewithext << endl;
+                            printf("I just got past the third line");
+
             std::string dotarff = ".arff";
             filenamewithextdotarff.insert(filenamewithextdotarff.end(), dotarff.begin(), dotarff.end());
             ofstream ArffInputFromCSV(filenamewithextdotarff.c_str());
@@ -270,7 +284,8 @@ int main (int argc, const char* argv[])
                 {
 
                     getline(littlestream,field,',');
-                    if(strcmp(fields[pos],"seq")==0)
+                    std::string fieldsatposition = fields[pos];
+                    if(fieldsatposition.compare("seq"))
                     {
                         seqpos = pos;
                         const char* seq_tmp = field.c_str();
@@ -279,15 +294,13 @@ int main (int argc, const char* argv[])
                         int aapos = 0;
                         while (acid[aapos] != '\0')
                         {
-
-
                                     std::string aacountwithcomma = "";
         sprintf(const_cast<char*>(aacountwithcomma.c_str()),"%d,",countletter(seq_tmp,acid.at(aapos)));
                             restructured_line.append(aacountwithcomma);  //this loop should put counts of all the amino acids right after the sequence
                             aapos++;
                         }
                     }
-                    else if (strcmp(fields[pos],"mz")==0 || strcmp(fields[pos],"intensity")==0 || strcmp(fields[pos],"rt")==0 || strcmp(fields[pos],"charge")==0)
+                    else if (fieldsatposition.compare("mz") || fieldsatposition.compare("intensity") || fieldsatposition.compare("rt") || fieldsatposition.compare("charge"))
                     {
                         restructured_line.append(field).append(",");
                     }
@@ -311,13 +324,13 @@ int main (int argc, const char* argv[])
                         lineV.push_back (linetoken);
                     }
                     //reorders the vector according to fields[], then writes it to restructured_line
-                    vector<std::string> tmp_V; tmp_V.resize(lineV.size());
+                    vector<std::string> tmp_V; tmp_V.resize((int)(lineV.size()));
 
 
                     tmp_V[getindex("seq",fields)] = lineV[seqpos];
                     std::string acid = "ARNDBCEQZGHILKMFPSTWYV";
                     int acidcounter = 0;
-                    while (acidcounter < acid.size())
+                    while (acidcounter < (int)(acid.size()));
                     {
                         acidcounter++;
                         const char* aaonecharacterstring = acid.substr(acidcounter,1).c_str();
@@ -329,7 +342,7 @@ int main (int argc, const char* argv[])
                     tmp_V[getindex("rt",fields)] = lineV[rtpos];
                     restructured_line = "";
                     //turning tmp_V into a line and writing it to restructured line
-                    for (int q = 0; q < tmp_V.size(); q++)
+                    for (int q = 0; q < (int)tmp_V.size(); q++)
                      {
                           restructured_line.append(tmp_V[q]).append(",");
                     }
